@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.project.mainPage.mapper.UsersMapper">
+ 
+ 	<select id="selectPageAll" resultType="UsersDto">
+ 		select * from USERS LIMIT #{startRow},#{pageSize}
+ 	</select>
+ 	
+ 	<select id="selectPageAllCount" resultType = "int" >
+ 		SELECT COUNT(*) FROM USERS 
+ 	</select>
+ 	
+ 	<!-- 로그인 -->
+ 	<select id="selectIdPwOne" resultType="UsersDto">
+ 		SELECT * FROM USERS WHERE userid = #{userId} AND userpw = #{userPw}
+ 	</select>
+ 	
+ 	<select id="selectOne" resultType="UsersDto" parameterType="String">
+ 		SELECT * FROM USERS WHERE userid=#{userId}
+ 	</select>
+ 	
+ 	<update id="updateOne" parameterType="UsersDto">
+ 		UPDATE USERS SET 
+ 			userid=#{userid}, 
+ 			username=#{username},
+ 			userpw=#{userpw}, 
+ 			phone=#{phone}, 
+ 			email=#{email},
+ 			birth=#{birth},
+ 			add1=#{add1},
+ 			add2=#{add2},
+ 			add3=#{add3}
+ 			WHERE userid=#{userid}
+ 	</update>
+ 	
+ 	<insert id="insertOne" parameterType="UsersDto">
+	 	 INSERT INTO USERS (userid, username, userpw, phone, email, birth, add1, add2, add3, signup)
+	 	 	VALUES (#{userid},#{username},#{userpw},#{phone},
+	 	 	#{email},#{birth},#{add1},#{add2},#{add3},#{signup})
+ 	</insert>
+ 	
+ 	<delete id="deleteOne" parameterType="UsersDto">
+ 		DELETE FROM USERS WHERE userid=#{userId}
+ 	</delete>
+ 	<!-- criteria(검색조건) -->
+	<sql id="criteria">
+		    <trim prefix="WHERE (" suffix=")" prefixOverrides="AND">
+	  		<foreach item="type" collection="typeArr">
+	  			<trim prefix="AND">
+	  				<choose>
+	  					<when test="type == 'P'.toString()">
+	  						<trim prefixOverrides="or">
+			  					<foreach collection="userArr" item="userid">
+			  						<trim prefix="or">
+			  							userid = #{userid}
+			  						</trim>
+			  					</foreach>  						
+	  						</trim>
+	  					</when>
+	  					<when test="type == 'A'.toString()">
+	  						userid LIKE CONCAT ('%', #{keyword}, '%')
+	  					</when>
+	  					<when test="type == 'N'.toString()">
+	  						username LIKE CONCAT ('%', #{keyword}, '%')
+	  					</when>  					
+	  				</choose>
+	  			</trim>
+	  		</foreach>
+	  	</trim>
+	</sql>
+	<select id="searchUsers" resultType="UsersDto">
+			SELECT * FROM USERS
+			<include refid="criteria"></include>
+			order by userid desc 
+			limit #{skip}, #{amount}	
+	</select>
+	<select id="usersGetTotal" resultType="int">
+  		SELECT COUNT(*) FROM USERS
+		<include refid="criteria"></include>
+	</select>
+	<select id="selectSearchAll" resultType="UsersDto">
+		SELECT * FROM USERS LIMIT #{skip}, #{amount}
+	</select>
+ </mapper>

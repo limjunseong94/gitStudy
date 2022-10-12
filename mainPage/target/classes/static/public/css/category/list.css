@@ -1,0 +1,19 @@
+@charset "UTF-8";
+
+#detail:hover{
+	cursor: Pointer;
+}
+
+html, body {
+    height: 100%
+}
+
+#wrapper {
+    min-height: 100%;
+    position: relative;
+    padding-bottom: 350px;
+}
+
+.footer {
+    bottom: 0;
+}

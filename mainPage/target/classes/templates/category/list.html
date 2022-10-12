@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>카테고리 리스트</title>
+<link rel="stylesheet" href="/public/css/category/list.css">
+
+</head>
+<body>
+	<header th:insert="/gAndB"></header>
+	<header th:insert="/headerNav"></header>
+	<div id="wrapper">
+		<div  class="container">
+			<h1 class="m-3 d-flex justify-content-between align-items-center" >
+				<span>카테고리 목록</span>
+				<a href="/category/insert.do" class="btn btn-secondary">카테고리 등록</a>
+			</h1>
+			
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>카테고리 번호</th>
+						<th>카테고리 이름</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr id="detail" th:each="category : ${categoryList}"
+						th:onclick="location.href='/category/detail/[[${category.categoryId}]]'">
+						<td th:text="${category.categoryId}"></td>
+						<td th:text="${category.categoryName}"></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="d-flex justify-content-evenly" th:insert="/pagination.html"></div>
+		</div>
+		<footer class="footer" th:insert="/footer"></footer>
+	</div>
+</body>
+</html>

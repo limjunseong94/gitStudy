@@ -1,0 +1,27 @@
+@charset "UTF-8";
+html, body {
+    height: 100%
+}
+
+#wrapper {
+    min-height: 100%;
+    position: relative;
+    padding-bottom: 350px;
+}
+
+.footer {
+    bottom: 0;
+}
+
+#lefe {
+	float: left;
+}
+.card{
+	cursor: pointer;
+}
+
+#pagination{
+	display: flex;
+	justify-content: center;
+	clear: both;
+}

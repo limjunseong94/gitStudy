@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+       
+
+<mapper namespace="com.project.mainPage.mapper.ProductMapper">
+
+	<resultMap type="Product" id="ProductMap">
+		<id column="productid" property="productid"/>
+		<result column="productName" property="productName"/>
+		<result column="productSize" property="productSize"/>
+		<result column="productColor" property="productColor"/>
+		<result column="productInfo" property="productInfo"/>
+		<result column="productStock" property="productStock"/>
+		<result column="productDate" property="productDate"/>
+		<result column="price" property="price"/>
+		<!-- Product : Category = N : 1 -->
+		<association property="category" javaType="Category" foreignColumn="categoryId">
+				<id column="categoryId" property="categoryId"/>
+				<result column="categoryName" property="categoryName"/>
+		</association>
+		<collection property="productImgs" javaType="java.util.ArrayList" ofType="ProductImg">
+				<id column="iproduct_img_no" property="product_img_no"/>
+				<result column="iimg_path" property="img_path"/>
+		</collection>
+	</resultMap>
+
+	<select id="selectAll" resultMap="ProductMap">
+		select  p.*, c.categoryName
+			from product p left join category c using(categoryid) LIMIT #{startRow},#{pageSize}
+	</select>
+	<select id="selectAllProduct" resultMap="ProductMap">
+		select  p.*, c.categoryName
+			from product p left join category c using(categoryid)
+	</select>
+	 <select id="selectAllCount" resultType = "int" >
+ 		SELECT COUNT(*) FROM PRODUCT 
+ 	</select>
+	
+	<select id="selectOne" resultMap="ProductMap">
+		SELECT 
+			p.*,
+			i.product_img_no as iproduct_img_no,
+			i.img_path as iimg_path
+			FROM PRODUCT p
+			LEFT JOIN PRODUCT_IMG i
+			USING(productid)
+			WHERE productid=#{productid}
+	</select>
+	<select id="selectByProductName" resultMap="ProductMap">
+		SELECT *
+			FROM PRODUCT
+			WHERE productName=#{productName}
+	</select>
+	
+	<update id="updateOne" parameterType="Product">
+		UPDATE PRODUCT SET 
+			productName=#{productName}, 
+			productSize=#{productSize},
+			productColor=#{productColor},
+			productInfo=#{productInfo},
+			productStock=#{productStock},
+			price=#{price},
+			categoryid=#{category.categoryId}
+			WHERE productid=#{productid}
+	</update>
+	
+
+	 <insert id="insertOne" parameterType="Product"
+	 useGeneratedKeys="true" keyProperty="productid">
+
+      INSERT INTO PRODUCT (productName,productSize,productColor,
+         productInfo,productStock,productDate,
+         price,categoryid)
+       VALUES
+         (#{productName},#{productSize},#{productColor},
+         #{productInfo},#{productStock},#{productDate},
+         #{price},#{category.categoryId})
+
+   	</insert>
+
+	<delete id="deleteOne" parameterType="int">
+		DELETE FROM PRODUCT WHERE productid=#{productid}
+	</delete>
+
+	<!-- criteria(검색조건) -->
+	<sql id="criteria">
+		    <trim prefix="WHERE (" suffix=")" prefixOverrides="AND">
+	  		<foreach item="type" collection="typeArr">
+	  			<trim prefix="AND">
+	  				<choose>
+	  					<when test="type == 'N'.toString()">
+	  						productName LIKE CONCAT ('%', #{keyword}, '%')
+	  					</when>
+	  					<when test="type == 'S'.toString()">
+	  						productSize LIKE CONCAT ('%', #{keyword}, '%')
+	  					</when>  					
+	  					<when test="type == 'C'.toString()">
+	  						c.categoryName LIKE CONCAT ('%', #{keyword}, '%')
+	  					</when>  					
+	  				</choose>
+	  			</trim>
+	  		</foreach>
+	  	</trim>
+	</sql>
+	<select id="searchProduct" resultMap="ProductMap">
+			select  p.*, c.categoryName
+			from product p left join category c using(categoryid)
+			<include refid="criteria"></include>
+			order by productid desc 
+			limit #{skip}, #{amount}	
+	</select>
+	<!-- 상품 총 개수 -->
+	<select id="productsGetTotal" resultType="int">
+  		SELECT COUNT(*) FROM PRODUCT INNER JOIN CATEGORY c USING(categoryid)
+		<include refid="criteria"></include>
+	</select>
+	
+	<select id="searchAllProduct" resultMap="ProductMap">
+			SELECT  p.*, c.categoryName
+			FROM PRODUCT p INNER JOIN CATEGORY c USING(categoryid)
+			WHERE productName LIKE CONCAT ('%', #{keyword}, '%') OR
+				productSize LIKE CONCAT ('%', #{keyword}, '%') OR
+				productColor LIKE CONCAT ('%', #{keyword}, '%') OR
+				c.categoryName LIKE CONCAT ('%', #{keyword}, '%')
+			ORDER BY productid desc 
+			LIMIT #{skip}, #{amount}	
+	</select>
+	<select id="productsAllGetTotal" resultType="int">
+  		SELECT COUNT(*) FROM PRODUCT INNER JOIN CATEGORY c USING(categoryid)
+  		WHERE productName LIKE CONCAT ('%', #{keyword}, '%') OR
+			productSize LIKE CONCAT ('%', #{keyword}, '%') OR
+			productColor LIKE CONCAT ('%', #{keyword}, '%') OR
+			c.categoryName LIKE CONCAT ('%', #{keyword}, '%')
+	</select>
+</mapper>

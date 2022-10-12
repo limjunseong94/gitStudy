@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>공지사항 게시글</title>
+<style>
+#footerConfig{
+    background: #f0f0f0;
+    overflow: hidden;
+    word-break: keep-all;
+    padding: 40px;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    position: absolute;
+}
+.footerList{
+	display: inline-block;
+    float: none;
+    text-align: center;
+}
+.footerList>a{
+	text-decoration: none;
+	margin-right: 15px;
+	color: black;
+}
+.table-hover{
+	cursor: pointer;
+}
+.footer{
+position : fixed;
+bottom : 0;
+width: 100%;
+}
+</style>
+</head>
+<body>
+	<header th:insert="/gAndB"></header>
+	<header th:insert="/headerNav"></header>
+<!-- 	<p th:text="${noticeList}"></p> -->
+	<div class="container">
+		<div class="m-3 d-flex justify-content-between align-items-center">
+			<h1>공지사항</h1>
+			<th:block th:if="${session.loginUsers?.adminCk == 1}">
+				<a href="/notice/insert.do" class="btn btn-primary">공지사항 등록</a>
+			</th:block>
+		</div>
+		<div class="d-flex justify-content-center">
+			<form action="/notice/search/1" id="searchForm" method="get">
+				<select name="type" class="form-control" style="display: inline; width : 150px;">
+					<option value="T">제목</option>
+					<option value="C">내용</option>
+				</select>
+				<div class=search_input style="display: inline;">
+					<input type="text" name="keyword" onkeyup="noSpaceForm(this);" onchange="noSpaceForm(this);">
+					<button class="btn btn-outline-primary">검색</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="container mt-5">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>no</th>
+					<th>글쓴이 아이디</th>
+					<th>타이틀</th>
+					<th>등록일</th>
+					<th>조회수</th>
+				</tr>
+			</thead>
+			<tbody>
+				<th:block th:each="notice : ${noticeList}" >
+					<tr th:onclick="location.href='/notice/detail/[[${notice.notice_no}]]'">
+						<td th:text="${notice.notice_no}"></td>
+						<td th:text="${notice.users?.userid}"></td>
+						<td th:text="${notice.title}"></td>
+						<td th:text="${#dates.format(notice.post_time,'yyyy-MM-dd HH:mm:ss')}"></td>
+						<td th:text="${notice.views}"></td>
+					</tr>				
+				</th:block>
+			</tbody>
+		</table>
+		<div class="d-flex justify-content-center">
+			<div  th:insert="/pagination.html"></div>
+		</div>
+	</div>
+</body>
+<footer class = "footer" th:insert="/footer"></footer>
+<script>
+function noSpaceForm(obj) { // 공백사용못하게
+    var str_space = /\s/;  // 공백체크
+    if(str_space.exec(obj.value.trim)) { //공백 체크
+        //alert("해당 항목에는 공백을 사용할수 없습니다.\n\n공백은 자동적으로 제거 됩니다.");
+        obj.focus();
+        obj.value = obj.value.replace(/\s| /gi,''); // 공백제거
+        return false;
+    }
+}
+</script>
+</html>

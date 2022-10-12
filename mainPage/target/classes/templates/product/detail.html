@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>상품 상세 페이지</title>
+<link rel="stylesheet" href="/public/css/product/detail.css">
+</head>
+<body>
+<script> 
+  function submit2(frm) { 
+	frm.method='get'; 
+    frm.action='/order/inserts.do'; 
+	
+    frm.submit(); 
+    return true; 
+  } 
+</script> 
+	<header th:insert="/gAndB"></header>
+	<header th:insert="/headerNav"></header>
+
+	<div id="wrapper">
+		<main class="mt-5 container d-flex justify-content-between">
+			<section  id="sectionTop">
+				<figure class="d-flex figure justify-content-between">
+					<th:block th:each="productImg : ${product.productImgs}">
+						<img id="imgId" th:src="@{/public/img/{fileName}(fileName=${productImg.img_path})}"
+						class="figure-img img-fluid rounded" alt="상품 이미지">
+					</th:block>
+				</figure>
+				<div>
+					<div class="mb-3">
+						<div id="productInfoId">
+							<th:block th:value="${product.productInfo}"
+								th:text="${product.productInfo}" >
+							</th:block>
+						</div> 
+					</div>
+				</div>
+				
+			</section>
+			<section style="display: table-cell; vertical-align: top; flex-grow: 1;">
+				<div class="d-flex align-items-center flex-column mb-3" style="height: 200px;">
+					<div class="col-auto mb-3">
+						<h4 th:text="${product.productid}" style="text-align: center;"></h4>
+					</div>
+					<form class="row g-5 d-flex" method="post" action="/basket/insert.do">
+						<div>
+							<div class="col-auto mb-3">
+								<label for="pName" class="form-label mt-3">상품명</label>
+								<input th:value="${product.productName}" class="form-control form-control-sm"
+									   	id="pName" disabled>
+							</div>
+							<div class="col-auto mb-3">
+								<label for="pSize" class="form-label mt-3">사이즈</label>
+								<select name="product.productid" class="form-select form-select-sm " aria-label=".form-select-sm example">
+									<th:block th:each="p : ${products}">
+										<option  th:value="${p.productid}" th:text="${p.productSize+' '+p.productColor}"></option>
+									</th:block>
+								</select> 
+							</div>  
+							<div class="col-auto mb-3">
+								<label for="price" class="form-label mt-3">price</label>
+								<input th:value="${product.price}" class="form-control form-control-sm" id="price" disabled>
+					  		</div>
+					  		<div class="col-auto mb-3">
+						  		<label for="count" class="form-label mt-3">개수</label>
+					            <input class="form-control text-center me-3" id="count" name="count" type="number" value="1"
+					                  onkeyup="noSpace(this);" onchange="noSpace(this);" 
+					                  style="max-width: 20rem"/>
+				            </div>
+					  		<section class="justify-content-around">
+								<div class="col-auto mt-3">
+									<button type="button" class="btn btn-outline-success" onclick="submit2(this.form)">구매 하기</button>
+									<th:block th:if="${session.loginUsers?.userid != null}">
+										<button class="btn btn-outline-dark flex-shrink-0" type="submit">
+						  				<i class="bi-cart-fill me-1"></i>
+						          	  	 장바구니 
+					        			</button>
+					       				<input type="hidden" name="productid" th:value="${productid}"> 
+									</th:block>
+									<th:block th:unless="${session.loginUsers?.userid != null}">
+										<a class="btn btn-outline-dark flex-shrink-0" href="/users/login.do">
+									    <i class="bi-cart-fill me-1"></i>
+									             장바구니
+								        </a> 
+									</th:block>
+								</div>
+							</section>
+						</div>
+					</form>
+				</div>
+			</section>
+		</main>
+ 	<footer class="footer" th:insert="/footer"></footer>
+	</div>
+</body>
+<script>
+function noSpace(obj) { // 공백사용못하게
+    var str = /\s/;  // 공백체크
+    if(str.exec(obj.value.trim)) { //공백 체크
+        //alert("해당 항목에는 첫 글자 공백을 사용할수 없습니다.");
+        obj.focus();
+        obj.value = obj.value.replace(/^ +/,''); // 공백제거
+        return false;
+    }
+}
+</script>
+</html>
