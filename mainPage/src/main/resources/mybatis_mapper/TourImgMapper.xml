@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mainPage.mapper.TourImgMapper">
+	<insert id="insertOne" parameterType="TourImg">
+		INSERT INTO TOURIMG(tour_rank, img_path)
+			VALUES(#{tour_rank}, #{img_path})
+	</insert>
+	<select id="selectTourRank" resultType="TourImg" parameterType="int">
+		SELECT * FROM TOURIMG
+			WHERE tour_rank =  #{tourRank}
+	</select>
+	<!-- update  -->
+	<select id="selectOne" resultType="TourImg" parameterType="int">
+		SELECT * FROM TOURIMG
+			WHERE tour_img_no = #{tourImgNo}
+	</select>
+	<delete id="deleteOne" parameterType="int">
+		DELETE FROM TOURIMG 
+			WHERE tour_img_no = #{tourImgNo}
+	</delete>
+	<select id="selectCountTourRank" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM TOURIMG 
+			WHERE tour_rank = #{tourRank}
+	</select>
+</mapper>

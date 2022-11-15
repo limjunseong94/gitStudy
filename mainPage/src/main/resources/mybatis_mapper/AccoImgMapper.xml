@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mainPage.mapper.AccoImgMapper">
+	<insert id="insertOne" parameterType="AccoImg">
+		INSERT INTO ACCOIMG(acco_rank, img_path)
+			VALUES(#{acco_rank}, #{img_path})
+	</insert>
+	<select id="selectAccoRank" resultType="AccoImg" parameterType="int">
+		SELECT * FROM ACCOIMG
+			WHERE acco_rank =  #{accoRank}
+	</select>
+	<select id="selectUserId" resultType="AccoImg" parameterType="String">
+		SELECT * FROM ACCOIMG
+			WHERE acco_rank
+				IN (SELECT acco_rank FROM ACCOMMODATE
+						WHERE tourist = #{tourist})
+	</select>
+	<!-- update  -->
+	<select id="selectOne" resultType="AccoImg" parameterType="int">
+		SELECT * FROM ACCOIMG
+			WHERE acco_img_no = #{accoImgNo}
+	</select>
+	<delete id="deleteOne" parameterType="int">
+		DELETE FROM ACCOIMG 
+			WHERE acco_img_no = #{accoImgNo}
+	</delete>
+	<select id="selectCountAccoRank" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM ACCOIMG 
+			WHERE acco_rank = #{accoRank}
+	</select>
+</mapper>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>음식점 정보 수정</title>
+<link rel="stylesheet" href="/public/css/rest/update.css">
+<script src="/public/js/top/rest/update.js" defer="defer"></script>
+</head>
+<body>
+	<header th:insert="/NewHeader"></header>
+	<div id="wrapper">
+		<main class="container-xl">
+		<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" id="path">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+					<a href="/">홈</a>
+				</li>
+				<li class="breadcrumb-item">
+					<a href="#">Top 10</a>
+				</li>
+				<li class="breadcrumb-item">
+					<a href="/top/rest/list/1" class="breadcrumb-item active">음식점</a>
+				</li>
+			</ol>
+		</nav>	
+		<h1 class="pb-4 d-flex" style="border-bottom: 1px solid #e8e8e8;">
+		    <span style="font-size: 35px;">음식점 정보 수정</span>
+	    </h1>
+	    <div class="mt-3 d-flex">
+		    <div class="d-flex align-items-center">
+				<i class="bi bi-eye" data-bs-toggle="tooltip" 
+				   data-bs-placement="top" data-bs-title="조회수">
+				   <span th:text="${restaurant.views}"></span>
+				</i>
+			</div>
+		</div>
+		<div class="mt-3">
+	   	<form action="/top/rest/update.do" method="post" enctype="multipart/form-data" name="restUpdateForm">
+		 <table class="mb-5 table table-bordered table">
+		  <tbody>
+		   <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">음식점명</th>
+		      <td style="width: 600px;">
+		      	<input name="tourist" class="form-control" id="tourist" th:value="${restaurant.tourist}"
+		      		   onkeyup="noSpace(this);" onchange="noSpace(this);">
+		      </td>
+		    </tr>
+		    <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">서귀포 / 제주</th>
+		      <td style="width: 600px;">
+		      	<select name="city" class="form-select" id="city" style="font-size: 11px; border-radius: 2px;">
+					<option value="서귀포시" th:selected="${restaurant.city} == '서귀포시'">서귀포</option>
+					<option value="제주시" th:selected="${restaurant.city} == '제주시'">제주</option>
+				</select>
+		      </td>
+		    </tr>
+		    <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">전화번호</th>
+		      <td style="width: 600px;">
+		      	<input name="rest_phone" class="form-control" id="rest_phone" th:value="${restaurant.rest_phone}"
+		      		   onkeydown="noSpaceForm(this);" onchange="noSpaceForm(this);" 
+					   oninput="phoneAutoComplete(this)" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');" maxlength="13">
+		      </td>
+		    </tr>
+		    <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">주소</th>
+		      <td style="width: 600px;">
+		      	<input name="address2" class="form-control" th:value="${restaurant.address2}"
+		      		   onkeyup="noSpace(this);" onchange="noSpace(this);"></input>
+		      </td>
+		    </tr>
+		     <tr>
+		    	<th style="width: 100px;" class="bg-light align-middle">사진</th>
+		    	<td>
+					<div>
+						<p th:unless="${#lists.isEmpty(restaurant.restaurantImgs)}" class="mb-2">삭제할 사진 선택</p>
+						<th:block th:each="restaurantImg: ${restaurant.restaurantImgs}">
+							<label>
+								<input name="restaurankImgNo" type="checkbox"
+									   class="form-check-input" th:value="${restaurantImg.restaurank_img_no}">
+								<img alt="음식점 이미지" 
+									 th:src="@{/public/img/{file}(file=${restaurantImg.img_path})}" 
+									 class="img-thumbnail" width="200">
+							</label>
+						</th:block>
+					</div>
+				    <div>
+						<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+						<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+						<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+						<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+						<input name="imgFile" class="form-control form-control-lg" type="file" style="height: 29px;">
+					</div>
+		    	</td>
+		    </tr>
+		    <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">설명</th>
+		      <td style="width: 600px;">
+		      	<input name="contents" class="form-control" th:value="${restaurant.contents}"
+		      		   onkeyup="noSpace(this);" onchange="noSpace(this);"></input>
+		      </td>
+		    </tr>
+		    <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">검색 수</th>
+		      <td style="width: 600px;">
+		      	<input name="search" class="form-control" th:value="${restaurant.search}"
+	      			   onkeydown="noSpaceForm(this);" onchange="noSpaceForm(this);"
+					   onKeyup="this.value=this.value.replace(/[^0-9]/g,'');"></input>
+		      </td>
+		    </tr>
+		  </tbody>
+		</table>
+		<div class="d-flex">
+			<div class="ms-auto">
+				<button class="btn btn-outline-warning btn-lg" type="reset" style="padding: 12px 12.5px;">초기화</button>
+				<button class="btn btn-outline-success btn-lg" type="submit" style="margin-left: 8px; margin-right: 8px; padding: 12px 20px;">수정</button>
+				<input type="hidden" name="rest_rank" th:value="${restaurant.rest_rank}">
+				<input type="hidden" name="user.user_id" th:value="${session.loginUser?.user_id}">
+				<!-- Button trigger modal -->
+				<button type="button" class="btn btn-outline-danger btn-lg" 
+					    style="margin-right: 8px; padding: 12px 20px;" 
+					    data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+				  삭제
+				</button>
+				<!-- Modal -->
+				<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" 
+					 style="opacity: 1" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+				  <div class="modal-dialog">
+				    <div class="modal-content">
+				      <div class="modal-header border-0">
+				        <h1 class="modal-title fs-5" id="staticBackdropLabel">경고</h1>
+				        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				      </div>
+				      <div class="modal-body">
+				        한 번 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?
+				      </div>
+				      <div class="modal-footer border-0" style="padding: 16px;">
+				        <button type="button" class="btn btn-outline-dark btn-lg" 
+				        		data-bs-dismiss="modal" style="margin: 0 8px 0 0; padding: 12px 20px;">취소</button>
+						<a th:href="@{/top/rest/delete/{restRank}/{userId}(restRank=${restaurant.rest_rank}, userId=${session.loginUser?.user_id})}" 
+						   class="btn btn-outline-danger btn-lg" style="margin: 0; padding: 12px 20px;">
+							삭제
+						</a>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+				<a th:href="@{/top/rest/detail/{restRank}(restRank=${restaurant.rest_rank})}" class="btn btn-outline-dark btn-lg ms-auto" style="padding: 12px 20px;">취소</a>
+			</div>
+		</div>
+	   </form>
+	  </div>
+	</main>
+	<footer class="footer" th:insert="/NewFooter"></footer> 
+</div>
+</body>
+</html>

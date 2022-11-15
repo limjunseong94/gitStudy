@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mainPage.mapper.RestaurantImgMapper">
+	<!-- 음식점 등록 -->
+	<insert id="insertOne" parameterType="RestaurantImg">
+		INSERT INTO RESTAURANTIMG(rest_rank, img_path)
+			VALUES(#{rest_rank}, #{img_path})
+	</insert>
+	<!-- update  -->
+	<select id="selectOne" resultType="RestaurantImg" parameterType="int">
+		SELECT * FROM RESTAURANTIMG
+			WHERE restaurank_img_no = #{restaurankImgNo}
+	</select>
+	<delete id="deleteOne" parameterType="int">
+		DELETE FROM RESTAURANTIMG 
+			WHERE restaurank_img_no = #{restaurankImgNo}
+	</delete>
+	<select id="selectCountRestRank" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM RESTAURANTIMG 
+			WHERE rest_rank = #{restRank}
+	</select>
+	<!-- 음식점 삭제  -->
+	<select id="selectRestRank" resultType="RestaurantImg" parameterType="int">
+		SELECT * FROM RESTAURANTIMG
+			WHERE rest_rank =  #{restRank}
+	</select>
+</mapper>

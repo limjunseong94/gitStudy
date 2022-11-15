@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원 수정</title>
+<link rel="stylesheet" href="/public/css/user/signup.css">
+<script src="/public/js/user/update.js" defer="defer"></script>
+<!-- 주소API기능연동 -->
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer="defer"></script>
+<script th:src="@{/public/js/user/adressApi.js}" defer="defer"></script>
+</head>
+<body>
+<header th:insert="/NewHeader"></header>
+<div id="wrapper">
+	 <main class="container-xl">
+	   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" id="path">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="/">홈</a>
+		    </li>
+		    <li class="breadcrumb-item" aria-current="page">
+		    	<a th:href="@{/user/detail/{userId}(userId=${user?.user_id})}" 
+		    	   class="breadcrumb-item active" th:text="${user?.user_name} + '(' + ${user?.user_id} + ')'"></a>
+		    </li>
+		  </ol>
+		</nav>
+		<div id="container">
+	        <div id="subContainer">
+	            <div id="signupBox">
+	                <div id="signupLogo">회원 수정</div>
+	                 <form action="/user/update.do" name="updateForm" id="signupForm" method="post" novalidate>
+	                    <div class="row g-3 align-items-center">
+						  <div class="col-auto signupInputBox">
+						    <input type="text" name="user_name" class="form-control signupInput" th:value="${user?.user_name}"
+						    	   placeholder="이름(필수) : 2 ~ 20자의 영문 또는 한글" maxlength="20">
+						  </div>
+						  <div class="box col-auto mt-0">
+						     <span id="nameHelp" class="form-text"></span>
+							 <span class="valid-feedback">
+							   사용 가능한 이름입니다.
+							 </span>
+							 <span id="nameHelpInvalid" class="invalid-feedback"></span> 
+						  </div>
+						</div>
+						<div class="row g-3 align-items-center">
+						  <div class="col-auto signupInputBox">
+						    <input type="text" name="user_id" class="form-control signupInput" th:value="${user?.user_id}"
+						    	   placeholder="ID(필수) : 6 ~ 20자의 영문 또는 영문 + 숫자" maxlength="20" readonly>
+						  </div>
+						  <div class="box col-auto mt-0">
+						     <span id="idHelp" class="form-text"></span>
+							 <span class="valid-feedback">
+							   사용 가능한 아이디입니다.
+							 </span>
+							 <span id="idHelpInvalid" class="invalid-feedback"></span> 
+							</div>
+						</div>
+						<div class="row g-3 align-items-center">
+						  <div class="col-auto signupInputBox">
+						    <input type="password" name="user_pw" class="form-control signupInput" th:value="${user?.user_pw}"
+						   		   placeholder="비밀번호(필수) : 8 ~ 16자의 대문자 + 소문자 + 숫자 + 특수 문자" maxlength="16">
+						  </div>
+						  <div class="box col-auto mt-0">
+						     <span id="pwHelp" class="form-text"></span>
+							 <span id="pwHelpValid" class="valid-feedback"></span>
+							 <span id="pwHelpInvalid" class="invalid-feedback"></span> 
+						  </div>
+						</div>
+						<div class="row g-3 align-items-center">
+						 <div class="col-auto signupInputBox">
+						    <input type="email" name="post_user_email" class="form-control signupInput" th:value="${user?.user_email}" 
+						    	   placeholder="이메일(필수) : 예시) Kevin@example.com">		
+				    	    <input type="hidden" name="user_email" th:value="${user?.user_email}">				  
+					     </div>
+						  <div class="box col-auto mt-0">
+						     <span id="emailHelp" class="form-text"></span>
+							 <span class="valid-feedback">
+							   사용 가능한 이메일입니다.
+							 </span>
+							 <span id="emailHelpInvalid" class="invalid-feedback"></span> 
+						  </div>
+						</div>
+						<div class="row g-3 align-items-center">
+						  <div class="col-auto signupInputBox">
+						    <input type="tel" name="post_user_phone" class="form-control signupInput" th:value="${user?.user_phone}" 
+						    	   oninput="phoneAutoComplete(this)" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');" 
+						    	   placeholder="휴대폰(필수) : 예시) 010-1234-1234 (하이픈(-)은 자동으로 생성)" maxlength="13">
+						    <input type="hidden" name="user_phone" th:value="${user?.user_phone}">	
+						  </div>
+						  <div class="box col-auto mt-0">
+						     <span id="phoneHelp" class="form-text"></span>
+							 <span class="valid-feedback">
+							   사용 가능한 전화번호입니다.
+							 </span>
+							 <span id="phoneHelpInvalid" class="invalid-feedback"></span> 
+						  </div>
+						</div> 
+						<div class="row g-3 align-items-center">
+							<div class="col-auto signupInputBox">
+							   <input class="form-control signupInput" type="date" name="birth" th:value="${#dates.format(user?.birth, 'yyyy-MM-dd')}" 
+							   		  placeholder="생일(필수)" aria-required="true">
+							</div>
+							<div class="box col-auto mt-0">
+						       <span id="birthHelp" class="form-text"></span>
+							   <span id="birthHelpInvalid" class="invalid-feedback"></span> 
+						    </div>
+						</div>
+						<div class="row g-3 align-items-center">
+						    <div class="col-auto signupInputBox" style="width: 303px;">
+							   <input type="text" class="form-control signupInput" name="add1" id="sample6_postcode" 
+							   		  placeholder="우편번호(필수)" th:value="${user?.add1}" readonly>
+							</div>
+						    <div class="col-auto mt-0 p-0">
+							   <input class="btn btn-secondary" type="button" name="user_addr_postcode_btn" onclick="sample6_execDaumPostcode()" 
+							   		  value="우편번호 찾기" style="height: 50px; margin-right: 8px;">
+				  		    </div>
+				  		    <div class="box col-auto mt-0">
+							   <span id="addPostCodeHelp" class="form-text"></span>
+							   <span class="valid-feedback"></span>
+							   <span id="addPostCodeHelpInvalid" class="invalid-feedback"></span> 
+						    </div>
+						</div> 
+						<div class="row g-3 align-items-center">
+						    <div class="col-auto signupInputBox">
+							   <input class="form-control signupInput" type="text" name="add2" th:value="${user?.add2}" 
+							   		  id="sample6_address" placeholder="주소(필수)" readonly>
+							</div>
+							<div class="box col-auto mt-0">
+							   <span id="addMainHelp" class="form-text"></span>
+							   <span class="valid-feedback"></span>
+							   <span id="addMainHelpInvalid" class="invalid-feedback"></span> 
+						    </div>
+						</div> 
+						<div class="row g-3 align-items-center">
+						    <div class="col-auto signupInputBox">
+							   <input class="form-control signupInput" type="text" name="add3" id="sample6_detailAddress" th:value="${user?.add3}" 
+							   		  onkeyup="noSpace(this)" onchange="noSpace(this)" placeholder="상세 주소(필수) : 우편번호를 찾은 후에 마우스를 올리면 입력 가능" readonly>
+							</div>
+							<div class="box col-auto mt-0">
+							   <span id="addDetailHelp" class="form-text"></span>
+							   <span class="valid-feedback"></span>
+							   <span id="addDetailHelpInvalid" class="invalid-feedback"></span> 
+						    </div>
+						</div> 
+						<div class="row g-3 align-items-center">
+						    <div class="col-auto signupInputBox">
+							   <input class="form-control signupInput" type="text" name="add4" th:value="${user?.add4}" 
+							   		  id="sample6_extraAddress" placeholder="참고 항목(선택)" readonly>
+							</div>
+						</div> 
+				    	<div class="mt-5 mb-3">
+							<div>
+								<div>
+									<button type="reset" class="btn btn-outline-warning btn-lg me-2" name="resetBtn" style="padding: 12px 29px; height: 50px;">초기화</button>
+									<button type="submit" class="btn btn-outline-success btn-lg me-2" style="padding: 12px 36.5px; height: 50px;">수정</button>
+									<a class="btn btn-outline-danger btn-lg me-2" data-bs-toggle="modal" 
+									   href="#exampleModalToggle" role="button" style="padding: 12px 36.5px; height: 50px;">삭제</a>
+									<a class="btn btn-outline-dark btn-lg" th:href="@{/user/detail/{userId}(userId=${user?.user_id})}" style="padding: 12px 36.5px; height: 50px;">취소</a>
+								</div>
+								<div class="modal fade" id="exampleModalToggle" aria-hidden="true" 
+									 style="opacity: 1" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+								  <div class="modal-dialog modal-dialog">
+								    <div class="modal-content">
+								      <div class="modal-header border-0">
+								        <h1 class="modal-title fs-5" id="exampleModalToggleLabel">경고</h1>
+								        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								      </div>
+								      <div class="modal-body">
+								        삭제하시겠습니까?
+								      </div>
+								      <div class="modal-footer border-0" style="padding: 16px;">
+								        <button type="button" class="btn btn-outline-primary btn-lg" data-bs-target="#exampleModalToggle2" 
+								        		data-bs-toggle="modal" style="margin: 0 8px 0 0; padding: 12px 27.5px;">예</button>
+								      	<button type="button" class="btn btn-outline-dark btn-lg" data-bs-dismiss="modal" style="margin: 0; padding: 12px 12.5px;">아니오</button>
+								      </div>
+								    </div>
+								  </div>
+								</div>
+								<div class="modal fade" id="exampleModalToggle2" aria-hidden="true" 
+									 style="opacity: 1" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+								  <div class="modal-dialog modal-dialog">
+								    <div class="modal-content">
+								      <div class="modal-header border-0">
+								        <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">경고</h1>
+								        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								      </div>
+								      <div class="modal-body">
+								        삭제 시 회원의 모든 정보가 삭제되며 복구할 수 없습니다. 그래도 삭제하시겠습니까?
+								      </div>
+								      <div class="modal-footer border-0" style="padding: 16px;">
+								        <button type="button" class="btn btn-outline-dark btn-lg" data-bs-dismiss="modal" style="margin: 0 8px 0 0; padding: 12px 20px;">취소</button>
+								        <a class="btn btn-outline-danger btn-lg" th:href="@{/user/delete/{userId}(userId=${user?.user_id})}" style="margin: 0; padding: 12px 20px;">삭제</a>
+								    </div>
+								  </div>
+								</div>
+							</div>
+						</div>
+					</div>
+					</form>
+	            </div>
+	        </div>
+	    </div>
+	  </main>
+<footer class="footer" th:insert="/NewFooter"></footer>
+</div>
+</body>
+</html>

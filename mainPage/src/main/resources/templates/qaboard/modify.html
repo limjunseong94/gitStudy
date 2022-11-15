@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>고객 문의 수정</title>
+<link rel="stylesheet" href="/public/css/qaboard/detail.css">
+<script src="/public/js/qaboard/modify.js" defer="defer"></script>
+</head>
+<body>
+<header th:insert="/NewHeader"></header>
+<div id="wrapper">
+ <main class="container-xl">
+     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" id="path">
+	   <ol class="breadcrumb">
+	    <li class="breadcrumb-item">
+	    	<a href="/">홈</a>
+	    </li>
+	    <li class="breadcrumb-item">
+	    	<a href="#">고객 센터</a>
+	    </li>
+	    <li class="breadcrumb-item" aria-current="page">
+	    	<a href="/qaboard/list/1" class="breadcrumb-item active">고객 문의</a>
+	    </li>
+	  </ol>
+	</nav>
+    <h1 class="pb-4 d-flex justify-content-between align-items-center" 
+	    style="border-bottom: 1px solid #e8e8e8; min-width: 1200px;">
+	    <span style="font-size: 35px;">고객 문의 수정</span>
+    </h1>	
+    <div class="mt-3 d-flex">
+		<i class="bi bi-eye" style="margin-right: 4px;"
+			data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="조회수">
+			<span th:text="${qaBoard.views}"></span>
+		</i>
+		<div class="ms-auto align-self-center">
+			<span th:text="'등록일 : ' + ${#dates.format(qaBoard.qaBoardDate,'yyyy-MM-dd HH:mm:ss')}"></span>
+		</div>
+    </div>
+	<form action="/qaboard/update.do" method="post" name="qaUpdateForm">
+		<table class="mt-3 mb-5 table align-middle table-bordered">
+			<tbody>
+				<tr>
+					<th class="table-light align-middle">유형</th>
+					<td>
+						<select name="category_id" class="form-select" id="category_id" th:value="${qaBoard.category.category_id}" style="font-size: 11px; border-radius: 2px;">
+								<option value="1" th:selected="${qaBoard.category.category_id} == '1'">관광지</option>
+								<option value="2" th:selected="${qaBoard.category.category_id} == '2'">숙박</option>
+								<option value="3" th:selected="${qaBoard.category.category_id} == '3'">맛집</option>
+							</select>
+					</td>
+				</tr>
+				<tr>
+					<th class="table-light align-middle">제목</th>
+					<td>
+						<input name="qaBoardTitle" th:value="${qaBoard.qaBoardTitle}" 
+							   type="text" class="form-control"
+							   onkeyup="noSpace(this)" onchange="noSpace(this);">
+					</td>
+				</tr>
+				<tr>
+					<th class="table-light align-middle">내용</th>
+					<td>
+						<textarea name="qaBoardContents" 
+						class="form-control" th:text="${qaBoard.qaBoardContents}" 
+						onkeyup="noSpace(this)" onchange="noSpace(this);"></textarea>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="d-flex">
+			<div class="ms-auto">
+				<button type="reset" class="btn btn-outline-warning btn-lg" style="padding: 12px 12.5px;">초기화</button>
+				<button type="submit" class="btn btn-outline-success btn-lg" style="margin-left: 8px; margin-right: 8px; padding: 12px 20px;">수정</button>
+				<input name="qaBoardNo" type="hidden" th:value="${qaBoard.qaBoardNo}">
+				<!-- Button trigger modal -->
+				<button type="button" class="btn btn-outline-danger btn-lg" 
+					    style="margin-right: 8px; padding: 12px 20px;" data-bs-toggle="modal" 
+					    data-bs-target="#staticBackdrop">
+				  삭제
+				</button>
+				<!-- Modal -->
+				<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" 
+					 style="opacity: 1" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+				  <div class="modal-dialog">
+				    <div class="modal-content">
+				      <div class="modal-header border-0">
+				        <h1 class="modal-title fs-5" id="staticBackdropLabel">경고</h1>
+				        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				      </div>
+				      <div class="modal-body">
+				        한 번 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?
+				      </div>
+				      <div class="modal-footer border-0" style="padding: 16px;">
+				        <button type="button" class="btn btn-outline-dark btn-lg" data-bs-dismiss="modal" 
+				        	    style="margin: 0 8px 0 0; padding: 12px 20px;">취소</button>
+						<a class="btn btn-outline-danger btn-lg" th:href="@{/qaboard/delete/{no}(no=${qaBoard.qaBoardNo})}" 
+				   		   style="margin: 0; padding: 12px 20px;">삭제</a>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+				<a class="btn btn-outline-dark btn-lg" th:href="@{/qaboard/detail/{no}(no=${qaBoard.qaBoardNo})}"
+				   style="padding: 12px 20px;">취소</a>
+			</div>
+		</div>
+	</form>
+</main>
+<footer class="footer" th:insert="/NewFooter"></footer>
+</div>
+</body>
+</html>

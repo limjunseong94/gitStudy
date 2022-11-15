@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mainPage.mapper.QaBoardMapper">
+	<resultMap type="QaBoard" id="QaBoardMap">
+		<id column="qaBoardNo" property="qaBoardNo"/>
+		<result column="qaBoardTitle" property="qaBoardTitle"/>
+		<result column="qaBoardContents" property="qaBoardContents"/>
+		<result column="qaBoardAnswer" property="qaBoardAnswer"/>
+		<result column="qaBoardDate" property="qaBoardDate"/>
+		<result column="views" property="views"/>
+		<association property="category" javaType="Category"  foreignColumn="category_id">
+			<id column="category_id" property="category_id"/>
+			<id column="category_name" property="category_name"/>
+		</association>
+		<association property="user" javaType="UserDto" foreignColumn="user_id">
+			<id column="user_id" property="user_id"/>
+			<result column="user_name" property="user_name"/>
+			<result column="user_email" property="user_email"/>
+			<result column="user_phone" property="user_phone"/>
+		</association>
+		<association property="qaReply" javaType="qaReply" foreignColumn="qaBoardNo">
+			<id column="qaReplyNo" property="qaReplyNo"/>
+			<result column="qaReplyContent" property="qaReplyContent"/>
+			<result column="qaReplyDate" property="qaReplyDate"/>
+		</association>
+	</resultMap>
+	<select id="selectPageAll" resultMap="QaBoardMap">
+		SELECT q.*, 
+		
+		u.user_id,
+		u.user_name,
+		u.user_email,
+		u.user_phone,
+		
+		c.*,
+		
+		r.*
+		
+		FROM QABOARD q 
+		
+		LEFT JOIN USER u 
+		USING(user_id)
+		
+		LEFT JOIN CATEGORY c
+		USING(category_id)
+		
+		LEFT JOIN QAREPLY r
+		USING(qaBoardNo)
+		
+		<if test="field != null">
+			WHERE ${field} LIKE CONCAT('%', #{search}, '%')
+		</if>
+		<if test="sort != null">
+			ORDER BY ${sort} 
+		</if>
+		<if test="direct != null">
+			<choose>
+				<when test="direct.equals('desc')">desc</when>
+				<otherwise>asc</otherwise>
+			</choose>
+		</if>
+		LIMIT #{startRow}, #{pageSize}
+	</select>
+	<select id="selectPageAllCount" resultType="int">
+		SELECT COUNT(*) FROM QABOARD
+		
+		LEFT JOIN USER u 
+		USING(user_id)
+		
+		LEFT JOIN CATEGORY c
+		USING(category_id)
+		
+		LEFT JOIN QAREPLY r
+		USING(qaBoardNo)
+		
+		<if test="field != null">
+			WHERE ${field} LIKE CONCAT('%', #{search}, '%')
+		</if>
+	</select>
+	<update id="answerOne" parameterType="QaBoard">
+ 		UPDATE QABOARD SET 
+ 			qaBoardAnswer = #{qaBoardAnswer}
+ 				WHERE qaBoardNo = #{qaBoardNo}
+ 	</update>
+	<select id="selectOne" resultMap="QaBoardMap" parameterType="int">
+		SELECT q.*,
+		
+		u.user_id,
+		u.user_name,
+		u.user_email,
+		u.user_phone,
+		
+		c.category_id,
+		
+		r.*
+		
+		FROM QABOARD q 
+		
+		LEFT JOIN USER u 
+		USING(user_id)
+		
+		LEFT JOIN CATEGORY c
+		USING(category_id)
+		
+		LEFT JOIN QAREPLY r 
+		USING(qaBoardNo)
+		
+		WHERE qaBoardNo = #{qaBoardNo}
+	</select>
+	<insert id="insertOne" parameterType="QaBoard"
+	 		useGeneratedKeys="true" keyProperty="qaBoardNo">
+		INSERT INTO QABOARD (qaBoardTitle, qaBoardContents, category_id, user_id)
+			VALUES (#{qaBoardTitle}, #{qaBoardContents}, #{category_id}, #{user.user_id})
+	</insert>
+	<update id="updateOne" parameterType="QaBoard">
+		UPDATE QABOARD SET 
+			qaBoardTitle = #{qaBoardTitle},
+			qaBoardContents = #{qaBoardContents},
+			category_id = #{category_id}
+				WHERE qaBoardNo = #{qaBoardNo} 
+	</update>
+	<delete id="deleteOne" parameterType="int">
+		DELETE FROM QABOARD 
+			WHERE qaBoardNo = #{qaBoardNo}
+	</delete>
+	<update id="detailUpdateViews" parameterType="int">
+		UPDATE QABOARD SET 
+			views = views + 1
+				WHERE qaBoardNo = #{qaBoardNo}
+	</update>
+</mapper>

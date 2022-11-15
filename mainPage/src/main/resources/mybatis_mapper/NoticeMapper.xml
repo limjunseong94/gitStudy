@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mainPage.mapper.NoticeMapper">
+	<resultMap type="Notice" id="NoticeMap">
+		<id column="notice_no" property="notice_no"/>
+		<result column="title" property="title"/>
+		<result column="contents" property="contents"/>
+		<result column="post_time" property="post_time"/>
+		<result column="views" property="views"/>
+		<association property="user" javaType="UserDto" foreignColumn="user_id">
+			<id column="user_id" property="user_id"/>
+			<id column="user_name" property="user_name"/>
+			<id column="user_email" property="user_email"/>
+		</association>	
+		<collection property="noticeImgs" javaType="java.util.ArrayList" ofType="NoticeImg">
+			<id column="inotice_img_no" property="notice_img_no"/>
+			<id column="iimg_path" property="img_path"/>
+		</collection>
+	</resultMap>	
+	<select id="selectPageAll" resultMap="NoticeMap">
+		SELECT *, 
+			notice_no AS noticeNo,
+			
+			n.user_id AS 'user.user_id' 
+			
+			FROM NOTICE n
+			<if test="field != null">
+				WHERE ${field} LIKE CONCAT('%', #{search}, '%')
+			</if>
+			<if test="sort != null">
+				ORDER BY ${sort} 
+			</if>
+			<if test="direct != null">
+				<choose>
+					<when test="direct.equals('desc')">desc</when>
+					<otherwise>asc</otherwise>
+				</choose>
+			</if>
+			LIMIT #{startRow}, #{pageSize}
+	</select>
+	<select id="selectPageAllCount" resultType="int">
+		SELECT COUNT(*) FROM NOTICE
+		<if test="field != null">
+			WHERE ${field} LIKE CONCAT('%', #{search}, '%')
+		</if>
+	</select>
+	<select id="selectDetailOne" resultMap="NoticeMap">
+		SELECT n.*,
+		
+			u.*,
+			
+			i.*
+			
+			FROM NOTICE n 
+			
+			INNER JOIN USER u
+			USING(user_id)
+			
+			LEFT JOIN NOTICE_IMG i 
+			USING(notice_no)
+		
+			WHERE n.notice_no = #{noticeNo}
+	</select>
+	<!-- 조회수 -->
+	<update id="updateViews" parameterType="int">
+		UPDATE NOTICE SET 
+			views = views + 1
+				WHERE notice_no = #{noticeNo}
+	</update>
+	<!-- 공지사항 등록 -->
+	<insert id="insertOne" parameterType="Notice" 
+			useGeneratedKeys="true" keyProperty="notice_no">
+		INSERT INTO NOTICE (title, contents, user_id) 
+			VALUE (#{title}, #{contents}, #{user.user_id})
+	</insert>
+	<!-- 공지사항 수정  -->
+	<update id="updateOne" parameterType="Notice">
+		UPDATE NOTICE SET 
+			title = #{title},
+			contents = #{contents}
+				WHERE notice_no = #{notice_no}
+	</update>
+	<!-- 공지사항 삭제 -->
+	<delete id="deleteOne" parameterType="int">
+		DELETE FROM NOTICE 
+			WHERE notice_no = #{noticeNo}
+	</delete>
+</mapper>

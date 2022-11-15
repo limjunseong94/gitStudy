@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>공지사항 등록</title>
+<link rel="stylesheet" href="/public/css/board/insert.css">
+<script src="/public/js/notice/insert.js" defer="defer"></script>
+</head>
+<body>
+<header th:insert="/NewHeader"></header>
+<div id="wrapper">
+	<main class="container-xl">
+		<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" id="path">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="/">홈</a>
+		    </li>
+		    <li class="breadcrumb-item">
+		    	<a href="#">고객 센터</a>
+		    </li>
+		    <li class="breadcrumb-item" aria-current="page">
+		    	<a href="/notice/list/1" class="breadcrumb-item active">공지사항</a>
+		    </li>
+		  </ol>
+		</nav>
+		<h1 class="pb-4 d-flex justify-content-between align-items-center" 
+		    style="border-bottom: 1px solid #e8e8e8;">
+		    <span style="font-size: 35px;">공지사항 등록</span>
+	    </h1>	
+	    <form action="/notice/insert.do" method="post" name="noticeInsertForm">
+			<table class="mt-5 mb-5 table align-middle table-bordered">
+				<tbody>
+					<tr>
+						<th class="table-light align-middle">제목</th>
+						<td>
+							<input name="title" class="form-control" id="title" onkeyup="noSpace(this);" onchange="noSpace(this);">
+						</td>
+					</tr>
+					<tr>
+						<th class="table-light align-middle">내용</th>
+						<td>
+							<textarea name="contents" class="form-control" id="contents" onkeyup="noSpace(this);" onchange="noSpace(this);"></textarea>
+						</td>	
+					</tr>
+				</tbody>
+			</table>
+			<div class="d-flex">
+				<div class="ms-auto">
+					<button class="btn btn-outline-warning btn-lg" type="reset" style="padding: 12px 12.5px;">초기화</button>
+					<button class="btn btn-outline-primary btn-lg" type="submit" style="margin-left: 8px; margin-right: 8px; padding: 12px 20px;">등록</button>
+					<input type="hidden" name="user.user_id" th:value="${session.loginUser?.user_id}">
+					<a class="btn btn-outline-dark btn-lg" href="/notice/list/1" style="padding: 12px 20px;">목록</a>
+				</div>
+			</div>
+		</form>
+	</main>
+<footer class="footer" th:insert="/NewFooter"></footer>
+</div>
+</body>
+</html>

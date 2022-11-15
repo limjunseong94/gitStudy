@@ -1,0 +1,21 @@
+/* footer 하단 고정 */
+html, body {
+    height: 100vh;
+}
+#wrapper {
+    min-height: 100%;
+    position: relative;
+    padding-bottom: 400px;
+}
+.footer {
+    bottom: 0;
+    position: absolute;
+	width: 100%;
+}
+#home {
+	height: 100vh;
+	top: 0;
+}
+ol {
+	display: none;
+}

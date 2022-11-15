@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>숙박 상세</title>
+<link rel="stylesheet" href="/public/css/acco/detail.css">
+<script src="/public/js/top/tour/detail.js" defer="defer"></script>
+</head>
+<body>
+<header th:insert="/NewHeader"></header>
+<div id="wrapper">
+	<main class="container-xl">
+		<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" id="path">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="/">홈</a>
+		    </li>
+		    <li class="breadcrumb-item">
+		    	<a href="#">Top 10</a>
+		    </li>
+		    <li class="breadcrumb-item" aria-current="page">
+		    	<a href="/top/acco/list/1" class="breadcrumb-item active">숙박</a>
+		    </li>
+		  </ol>
+		</nav>
+		<h1 class="pb-4" style="border-bottom: 1px solid #e8e8e8; font-size: 35px;">
+		    <span th:text="${acco.acco_rank}"></span> .
+		    <span th:text="${acco.tourist}"></span>
+	    </h1>	
+		<div class="mt-3 d-flex">
+			<div class="d-flex align-items-center">
+				<i class="bi bi-eye" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="조회수">
+					<span th:text="${acco.views}"></span>
+				</i>
+			</div>
+	  	</div>
+	   <div class="col-md mt-3 mb-5">
+	    <div class="card mb-3">
+	      <div class="row">
+	       <div class="col-md-4">
+	          <div id="carouselExampleControls" class="carousel slide carousel-fade" data-bs-ride="carousel"
+			       style="width: 100%; height: 100%;">
+				  <div class="carousel-inner" style="width: 100%; height: 100%;">
+				  	<th:block th:each="accoImg : ${acco.accoImgs}">
+				  		<div class="carousel-item active" style="width: 100%; height:100%;">
+					      	<div class="mb-1" th:if="${accoImg != null}" style="width: 100%; height:100%;">
+								<!-- Button trigger modal -->
+								<button type="button" class="btn border-0" data-bs-toggle="modal"
+										style="padding: 0; width: 100%; height:100%;" 
+										th:data-bs-target="'#accoImgModal' + ${accoImg.acco_img_no}">
+									<img th:src="@{/public/img/{fileName}(fileName=${accoImg.img_path})}" alt="숙박 이미지" 
+				  						 style="width: 100%; height:100%;" class="card-img card-img-right">
+								</button>			
+							</div>
+				  		</div>
+						<!-- Modal -->
+						<div class="modal fade" style="opacity: 1"
+							th:id="'accoImgModal' + ${accoImg.acco_img_no}" >
+						  <div class="modal-dialog modal-dialog-centered modal-lg">
+						    <div class="modal-content" 
+						    	 style="background-color: rgba(255,255,255,0)">
+						      <div class="modal-body">
+		   						<img th:src="@{/public/img/{fileName}(fileName=${accoImg.img_path})}" alt="숙박 이미지"
+		   							 width="760" class="card-img card-img-right"> 
+						      </div>
+						    </div>
+						  </div>
+						</div>							
+				  	</th:block>
+				  	<th:block th:if="${#lists.isEmpty(acco.accoImgs)}">
+			  			<!-- Button trigger modal -->
+						<button type="button" class="btn border-0" data-bs-toggle="modal"
+								style="padding: 0; width: 100%; height:100%;" data-bs-target="#accoImgModal">
+							<img src="/img/NullImg.jpg" alt="숙박 이미지" 
+					  		     style="width: 100%; height:100%;" class="card-img card-img-right">
+						</button>	
+					 	<!-- Modal -->
+						<div class="modal fade" style="opacity: 1"
+							 id="accoImgModal" >
+						  <div class="modal-dialog modal-dialog-centered modal-lg">
+						    <div class="modal-content" 
+						    	 style="background-color: rgba(255,255,255,0)">
+						      <div class="modal-body">
+		   						<img src="/img/NullImg.jpg" alt="숙박 이미지"
+		   							 width="760" class="card-img card-img-right"> 
+						      </div>
+						    </div>
+						  </div>
+						</div>	
+				  	</th:block>
+				  </div>
+				  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+				    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				    <span class="visually-hidden">Previous</span>
+				  </button>
+				  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+				    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+				    <span class="visually-hidden">Next</span>
+				  </button>
+				 </div>
+	        </div>
+	        <div class="col-md-8">
+	          <div class="card-body">
+	            <table class="table">
+				  <tbody>
+			      	<tr>
+					 	<th class="bg-light align-middle">서귀포 / 제주</th>
+					    <td class="align-middle" th:text="${acco.city}"></td> 
+				    </tr>
+				    <tr>
+				        <th class="bg-light align-middle">카테고리</th>
+				        <th:block th:if="${acco.category.category_id == '1'}">
+							<td class="align-middle">관광지</td> 
+						</th:block>
+						<th:block th:if="${acco.category.category_id == '2'}">
+							<td class="align-middle">숙박</td> 
+						</th:block>	
+						<th:block th:if="${acco.category.category_id == '3'}">
+							<td class="align-middle">맛집</td> 
+						</th:block>
+				    </tr>
+				    <tr>
+				      <th class="bg-light align-middle">전화번호</th>
+				      <td class="align-middle" th:text="${acco.acco_phone}"></td>
+				    </tr>
+				    <tr>
+				      <th class="bg-light align-middle">주소</th>
+				      <td class="align-middle" th:text="${acco.address1}"></td>
+				    </tr>
+				    <tr>
+				      <th class="bg-light align-middle">설명</th>
+				      <td class="align-middle" th:text="${acco.contents}"></td>
+				    </tr>
+				    <tr>
+				      <th class="bg-light align-middle">검색 수</th>
+				      <td class="align-middle" th:text="${acco.search}"></td>
+				    </tr>
+				  </tbody>
+				</table>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+	  </div>		
+	  <div class="d-flex mb-5">
+		<div th:if="${session.loginUser?.adminCk == 1}" class="ms-auto">
+			<a th:href="@{/top/acco/update/{accoRank}(accoRank = ${acco.acco_rank})}" 
+			   class="btn btn-outline-info btn-lg" style="margin-right: 8px; padding: 12px 20px;">
+				수정
+			</a>
+			<a href="/top/acco/list/1" class="btn btn-outline-dark btn-lg" style="padding: 12px 20px;">목록</a>
+		</div>
+		<div th:unless="${session.loginUser?.adminCk == 1}" class="ms-auto">
+			<a href="/top/acco/list/1" class="btn btn-outline-dark btn-lg" style="padding: 12px 20px;">목록</a>
+		</div>
+	  </div> 
+	</main>	
+	 <footer class="footer" th:insert="/NewFooter"></footer> 
+	</div>
+</body>
+</html>

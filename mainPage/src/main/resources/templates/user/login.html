@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title> 로그인 </title>
+<link rel="stylesheet" href="/public/css/user/login.css">
+<script src="/public/js/user/login.js" defer="defer"></script>
+</head>
+<body>
+	<header th:insert="/NewHeader"></header>
+<div id="wrapper">
+<main class="container-xl">
+	<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" id="path">
+	  <ol class="breadcrumb">
+	    <li class="breadcrumb-item"><a href="/">홈</a></li>
+	    <li class="breadcrumb-item" aria-current="page">
+	    	<a href="/user/login.do" class="breadcrumb-item active">로그인</a>
+	    </li>
+	  </ol>
+	</nav>
+	<div id="container">
+      	  <div id="subContainer">
+              <div id="loginBox">
+               <div id="loginLogo">로그인</div>
+		 <form action="/user/login.do" id="loginForm" name="loginForm" method="post">
+		   <div class="row g-3 align-items-center">
+			<label for="inputId" class="form-label" style="margin-bottom: 0;">아이디</label>
+			<div class="col-auto loginInputBox">
+				<input type="text" name="user_id" class="form-control loginInput" id="inputId"
+					   placeholder="아이디" aria-describedby="id" 
+					   value="" maxlength="20">
+			</div>
+			<div class="col-auto mt-0">
+			    <span id="idHelp" class="form-text"></span>
+			    <span class="valid-feedback">
+				  	가입되어 있는 아이디입니다.
+				</span>
+				<span id="idHelpInvalid" class="invalid-feedback"></span> 
+			</div>
+		  </div>			
+		  <div class="row g-3 align-items-center">
+			<label for="inputPw" class="form-label" style="margin-bottom: 0;">비밀번호</label>
+			<div class="col-auto loginInputBox">
+				<input type="password" name="user_pw" class="form-control loginInput" 
+				 	   placeholder="비밀번호" id="inputPw" 
+				 	   value="" maxlength="16" readonly>
+			</div>
+			<div class="col-auto mt-0">
+			    <span id="pwHelp" class="form-text"></span>
+			    <span class="valid-feedback">
+				  	올바른 비밀번호입니다.
+				</span>
+				<span id="pwHelpInvalid" class="invalid-feedback"></span> 
+			</div>
+		  </div>
+		 <button class="btn btn-primary" style="margin-top: 35px;">로그인</button>
+		</form> 
+        <div class="mt-3">
+          <a class="btn btn-outline-danger" href="/user/signup.do">회원가입</a>
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" 
+          		  style="padding: 8px 28.5px; margin-left: 31.5px; margin-right: 31.5px;" data-bs-target="#backDropModalId">
+            아이디 찾기
+          </button>
+          <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" 
+          		  style="padding: 8px 22px;" data-bs-target="#backDropModalPw">
+            비밀번호 찾기
+          </button>
+          <!-- 아이디 칮기 Modal -->
+          <div class="modal fade" id="backDropModalId" data-bs-backdrop="static" 
+          	   data-bs-keyboard="false" style="opacity: 1;" tabindex="-1">
+            <div class="modal-dialog">
+              <form class="modal-content" action="/user/findId.do" name="findIdForm" method="post">
+                <div class="modal-header border-0">
+                  <h5 class="modal-title" id="backDropModalTitle">아이디 찾기</h5>
+                  <a class="btn-close" href="/user/login.do"></a>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+					<label for="inputName" class="form-label" style="margin-bottom: 0;">이름</label>
+					<div class="col mb-3" style="padding-right: 8px;">
+						<input type="text" name="user_name" class="form-control" 
+							   id="inputName" maxlength="20">
+					</div>
+					<div class="col-auto mb-3" style="padding-left: 8px;">
+					    <span id="nameHelp" class="form-text"></span>
+						<span id="nameHelpInvalid" class="invalid-feedback" style="margin-top: 7px;"></span> 
+					</div>
+				  </div>
+                  <div class="row">
+					<label for="inputEmail" class="form-label" style="margin-bottom: 0;">이메일</label>
+					<div class="col mb-3" style="padding-right: 8px;">
+						<input type="email" name="user_email" class="form-control" 
+							   id="inputEmail">
+					</div>
+					<div class="col-auto mb-3" style="padding-left: 8px;">
+					    <span id="emailHelp" class="form-text"></span>
+						<span id="emailHelpInvalid" class="invalid-feedback" style="margin-top: 7px;"></span> 
+					</div>
+				  </div>
+                  <div class="row">
+					<label for="inputPhone" class="form-label" style="margin-bottom: 0;">전화번호</label>
+					<div class="col mb-3" style="padding-right: 8px;">
+						<input type="tel" name="user_phone" class="form-control" id="inputPhone" maxlength="13"
+							   oninput="phoneAutoComplete(this)" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');"
+							   >
+					</div>
+					<div class="col-auto mb-3" style="padding-left: 8px;">
+					    <span id="phoneHelp" class="form-text"></span>
+						<span id="phoneHelpInvalid" class="invalid-feedback" style="margin-top: 7px;"></span> 
+					</div>
+				  </div>
+                </div>
+                <div class="modal-footer border-0" style="padding: 16px;">
+                  <a class="btn btn-outline-dark" href="/user/login.do" 
+                  	 style="margin: 0 8px 0 0; padding: 12px 20px;">취소</a>
+                  <button class="btn btn-outline-primary" style="margin: 0; padding: 12px 20px;">찾기</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <!-- 비밀번호 찾기 Modal -->
+          <div class="modal fade" id="backDropModalPw" data-bs-backdrop="static" 
+          	   data-bs-keyboard="false" style="opacity: 1;" tabindex="-1">
+            <div class="modal-dialog">
+              <form class="modal-content" action="/user/findPw.do" name="findPwForm" method="post">
+                <div class="modal-header border-0">
+                  <h5 class="modal-title" id="backDropModalTitle">비밀번호 찾기</h5>
+                  <a class="btn-close" href="/user/login.do"></a>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+					<label for="inputIdPw" class="form-label" style="margin-bottom: 0;">아이디</label>
+					<div class="col mb-3" style="padding-right: 8px;">
+						<input type="text" name="user_id" class="form-control" 
+							   id="inputIdPw" maxlength="20">
+					</div>
+					<div class="col-auto mb-3" style="padding-left: 8px;">
+					    <span id="idHelpPw" class="form-text"></span>
+						<span id="idHelpInvalidPw" class="invalid-feedback" style="margin-top: 7px;"></span> 
+					</div>
+				  </div>
+                  <div class="row">
+					<label for="inputNamePw" class="form-label" style="margin-bottom: 0;">이름</label>
+					<div class="col mb-3" style="padding-right: 8px;">
+						<input type="text" name="user_name" class="form-control" 
+							   id="inputNamePw" maxlength="20">
+					</div>
+					<div class="col-auto mb-3" style="padding-left: 8px;">
+					    <span id="nameHelpPw" class="form-text"></span>
+						<span id="nameHelpInvalidPw" class="invalid-feedback" style="margin-top: 7px;"></span> 
+					</div>
+				  </div>
+                  <div class="row">
+					<label for="inputEmailPw" class="form-label" style="margin-bottom: 0;">이메일</label>
+					<div class="col mb-3" style="padding-right: 8px;">
+						<input type="email" name="user_email" class="form-control" 
+							   id="inputEmailPw">
+					</div>
+					<div class="col-auto mb-3" style="padding-left: 8px;">
+					    <span id="emailHelpPw" class="form-text"></span>
+						<span id="emailHelpInvalidPw" class="invalid-feedback" style="margin-top: 7px;"></span> 
+					</div>
+				  </div>
+                  <div class="row">
+					<label for="inputPhonePw" class="form-label" style="margin-bottom: 0;">전화번호</label>
+					<div class="col mb-3" style="padding-right: 8px;">
+						<input type="tel" name="user_phone" class="form-control" id="inputPhonePw" maxlength="13"
+							   oninput="phoneAutoComplete(this)" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');"
+							   >
+					</div>
+					<div class="col-auto mb-3" style="padding-left: 8px;">
+					    <span id="phoneHelpPw" class="form-text"></span>
+						<span id="phoneHelpInvalidPw" class="invalid-feedback" style="margin-top: 7px;"></span> 
+					</div>
+				  </div>
+                </div>
+                <div class="modal-footer border-0" style="padding: 16px;">
+                  <a class="btn btn-outline-dark" href="/user/login.do" 
+                  	 style="margin: 0 8px 0 0; padding: 12px 20px;">취소</a>
+                  <button class="btn btn-outline-primary" style="margin: 0; padding: 12px 20px;">찾기</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+	   </div>
+	  </div>
+	</div>
+</main>
+<th:block th:if="${msg != null}">
+	 <div class="modal fade" id="msgModal" aria-labelledby="modalToggleLabel" 
+	 	  data-bs-backdrop="static" data-bs-keyboard="false"
+	 	  tabindex="-1" style="display: none; opacity: 1;" aria-hidden="true">
+       <div class="modal-dialog">
+         <div class="modal-content">
+           <div class="modal-header border-0">
+             <h5 class="modal-title">System Message</h5>
+             <a class="btn-close" href="/user/login.do"></a>
+           </div>
+           <div class="modal-body">
+             <p th:text="${msg}"></p>
+           </div>
+           <div class="modal-footer border-0" style="padding: 16px;">
+			  <a class="btn btn-outline-dark" href="/user/login.do" style="margin: 0; padding: 12px 20px;">확인</a>         
+		   </div>
+         </div>
+       </div>
+     </div>
+	<script th:inline="javascript">
+		const msgModal = new bootstrap.Modal('#msgModal');
+		msgModal.show();
+	</script>
+</th:block>
+<footer class="footer" th:insert="/NewFooter"></footer>
+</div>
+</body>
+</html>

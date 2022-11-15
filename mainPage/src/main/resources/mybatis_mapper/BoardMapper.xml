@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mainPage.mapper.BoardMapper">
+	<resultMap type="Board" id="BoardMap">
+		<id column="board_no" property="board_no"/>
+		<result column="place_name" property="place_name"/>
+		<result column="rating" property="rating"/>
+		<result column="title" property="title"/>
+		<result column="contents" property="contents"/>
+		<result column="post_time" property="post_time"/>
+		<result column="address1" property="address1"/>
+		<result column="address2" property="address2"/>
+		<result column="address3" property="address3"/>
+		<result column="prefer_good" property="good"/>
+		<result column="prefer_bad" property="bad"/>
+		<result column="prefer_active" property="prefer_active"/>
+		<result column="views" property="views"/>
+		<result column="reply_size" property="reply_size"/>
+		<association property="user" javaType="UserDto" foreignColumn="user_id">
+			<id column="user_id" property="user_id"/>
+			<result column="user_name" property="user_name"/>
+			<result column="user_email" property="user_email"/>
+			<result column="birth" property="birth"/>
+		</association>
+		<association property="category" javaType="Category" foreignColumn="category_id">
+			<id column="category_id" property="category_id"/>
+			<id column="category_name" property="category_name"/>
+		</association>
+		<collection property="replys" javaType="java.util.ArrayList" ofType="Reply">
+			<id column="reply_no" property="reply_no"/>
+			<result column="reply_contents" property="contents"/>
+			<result column="reply_post_time" property="post_time"/>
+			<result column="reply_img_path" property="img_path"/>
+			<result column="reply_good" property="good"/>
+			<result column="reply_bad" property="bad"/>
+			<association property="user" javaType="UserDto">
+				<id column="reply_user_id" property="user_id"/>
+				<result column="reply_user_name" property="user_name"/>
+			</association>
+			<collection property="good_prefers" ofType="ReplyPrefer" javaType="java.util.ArrayList">
+				<id column="rp_good_reply_prefer_no" property="reply_prefer_no"/>
+				<result column="rp_good_reply_no" property="reply_no"/>
+				<result column="rp_good_prefer" property="prefer"/>
+				<result column="rp_good_user_id" property="user_id"/>
+			</collection>
+			<collection property="bad_prefers" ofType="ReplyPrefer" javaType="java.util.ArrayList">
+				<id column="rp_bad_reply_prefer_no" property="reply_prefer_no"/>
+				<result column="rp_bad_reply_no" property="reply_no"/>
+				<result column="rp_bad_prefer" property="prefer"/>
+				<result column="rp_bad_user_id" property="user_id"/>
+			</collection>
+		</collection>
+		<collection property="boardImgs" javaType="java.util.ArrayList" ofType="BoardImg">
+			<id column="iboard_img_no" property="board_img_no"/>
+			<result column="iimg_path" property="img_path"/>
+		</collection>
+	</resultMap>
+	<select id="selectPageAll" resultMap="BoardMap">
+		SELECT 
+			DISTINCT b.board_no,
+			b.*,
+			(SELECT COUNT(*) FROM BOARD_PREFER WHERE board_no = b.board_no AND prefer = 1) prefer_good,
+
+			u.user_id, 
+			
+			(SELECT COUNT(*) FROM REPLY WHERE board_no = b.board_no) reply_size,
+		    
+		    c.*
+		    
+		    FROM BOARD b 
+		    
+		    LEFT JOIN USER u 
+		    USING(user_id)
+		    
+		    LEFT JOIN REPLY r 
+		    USING(board_no)
+	
+		    LEFT JOIN CATEGORY c 
+		    USING(category_id)
+		    
+		    <if test="field != null">
+				WHERE ${field} LIKE CONCAT('%', #{search}, '%')
+			</if>
+			<if test="sort != null">
+				ORDER BY ${sort} 
+			</if>
+			<if test="direct != null">
+				<choose>
+					<when test="direct.equals('desc')">desc</when>
+					<otherwise>asc</otherwise>
+				</choose>
+			</if>
+			LIMIT #{startRow}, #{pageSize}
+	</select>
+	<select id="selectPageAllCount" resultType="int">
+		SELECT COUNT(DISTINCT b.board_no) FROM BOARD b
+		
+			LEFT JOIN USER u 
+		    USING(user_id)
+		    
+		    LEFT JOIN REPLY r 
+		    USING(board_no)
+	
+		    LEFT JOIN CATEGORY c 
+		    USING(category_id)
+		    
+		<if test="field != null">
+			WHERE ${field} LIKE CONCAT('%', #{search}, '%')
+		</if>
+	</select>
+	<select id="selectDetailOneAll" resultMap="BoardMap" parameterType="int">
+		SELECT b.*,
+			(SELECT COUNT(*) FROM BOARD_PREFER WHERE board_no = b.board_no AND prefer = 1) prefer_good,
+			(SELECT COUNT(*) FROM BOARD_PREFER WHERE board_no = b.board_no AND prefer = 0) prefer_bad,
+			u.user_id, 
+			u.user_name, 
+			u.user_email,
+			
+			r.reply_no,
+			r.contents AS reply_contents, 
+			r.post_time AS reply_post_time,
+			r.img_path AS reply_img_path,
+			r.user_id AS reply_user_id, 
+			
+			i.board_img_no AS iboard_img_no,
+			i.img_path AS iimg_path,
+			
+		    c.category_id,
+			
+			rp_good.user_id 			AS rp_good_user_id,
+			rp_good.reply_prefer_no 	AS rp_good_reply_prefer_no,
+			rp_good.reply_no 			AS rp_good_reply_no,
+			rp_good.prefer 				AS rp_good_prefer,
+			
+			rp_bad.user_id 				AS rp_bad_user_id,
+			rp_bad.reply_prefer_no 		AS rp_bad_reply_prefer_no,
+			rp_bad.reply_no 			AS rp_bad_reply_no,
+			rp_bad.prefer 				AS rp_bad_prefer
+			
+			FROM BOARD b 
+			
+			INNER JOIN USER u 
+			USING(user_id)
+			
+			LEFT JOIN BOARD_IMG i 
+			USING(board_no)
+			
+			LEFT JOIN REPLY r 
+			USING(board_no)
+			
+			LEFT JOIN CATEGORY c 
+			USING(category_id) 
+			
+			LEFT JOIN (SELECT * FROM REPLY_PREFER WHERE prefer = 1) rp_good
+			ON r.reply_no = rp_good.reply_no
+			
+			LEFT JOIN (SELECT * FROM REPLY_PREFER WHERE prefer = 0) rp_bad
+			ON r.reply_no = rp_bad.reply_no
+			
+			WHERE b.board_no = #{boardNo}
+			ORDER BY reply_no DESC
+	</select>
+	<select id="selectOne" resultMap="BoardMap" parameterType="int">
+		SELECT b.*,
+			(SELECT COUNT(*) FROM BOARD_PREFER WHERE board_no = b.board_no AND prefer = 1) prefer_good,
+			(SELECT COUNT(*) FROM BOARD_PREFER WHERE board_no = b.board_no AND prefer = 0) prefer_bad,
+			<if test="loginUsersId != null">
+				(SELECT prefer FROM BOARD_PREFER WHERE board_no = b.board_no AND user_id = #{loginUsersId}) as prefer_active,
+			</if>
+			u.user_id, 
+			u.user_name, 
+			u.user_email, 
+			u.birth,
+			
+		    r.reply_no, 
+		    r.contents AS reply_contents, 
+		    r.post_time AS reply_post_time, 
+		    r.img_path AS reply_img_path, 
+		    r.good AS reply_good,
+		    r.bad AS reply_bad, 
+		    r.user_id AS reply_user_id,
+		    
+		    i.board_img_no AS iboard_img_no,
+		    i.img_path AS iimg_path,
+		    
+		    c.category_id,
+		     
+		    rp_good.user_id AS rp_good_user_id,
+		    rp_good.reply_prefer_no AS rp_good_reply_prefer_no,
+		    rp_good.reply_no AS rp_good_reply_no,
+		    rp_good.prefer AS rp_good_prefer,
+		    
+		    rp_bad.user_id AS rp_bad_user_id,
+		    rp_bad.reply_prefer_no AS rp_bad_reply_prefer_no,
+		    rp_bad.reply_no AS rp_bad_reply_no,
+		    rp_bad.prefer AS rp_bad_prefer
+		    
+		    FROM BOARD b 
+		    
+		    INNER JOIN USER u 
+		    USING(user_id) 
+		    
+		    LEFT JOIN BOARD_IMG i 
+		    USING(board_no)
+		    
+		    LEFT JOIN REPLY r 
+		    USING(board_no) 
+	
+		    LEFT JOIN CATEGORY c 
+		    USING(category_id) 
+		    
+		    LEFT JOIN (SELECT * FROM REPLY_PREFER WHERE prefer = 1) rp_good
+		    ON r.reply_no = rp_good.reply_no
+		    
+		    LEFT JOIN (SELECT * FROM REPLY_PREFER WHERE prefer = 0) rp_bad
+		    ON r.reply_no = rp_bad.reply_no
+		    
+		    WHERE b.board_no = #{boardNo}	
+	</select>
+	<insert id="insertOne" parameterType="Board"
+	 		useGeneratedKeys="true" keyProperty="board_no">
+		INSERT INTO BOARD 
+			(place_name, rating, title, contents, user_id, category_id)
+				VALUES (#{place_name}, #{rating}, #{title}, #{contents}, #{user.user_id}, #{category_id})
+	</insert>
+	<update id="updateOne" parameterType="Board">
+		UPDATE BOARD SET 
+			place_name = #{place_name},
+			rating = #{rating},
+			title = #{title},
+			contents = #{contents},
+			category_id = #{category_id}
+				WHERE board_no = #{board_no}
+	</update>
+	<delete id="deleteOne" parameterType="int">
+		DELETE FROM BOARD 
+			WHERE board_no = #{boardNo}
+	</delete>
+	<update id="detailUpdateViews" parameterType="int">
+		UPDATE BOARD SET 
+			views = views + 1
+				WHERE board_no = #{boardNo}
+	</update>
+</mapper>

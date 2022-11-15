@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.project.mainPage.mapper.UserMapper">
+ 	<select id="selectPageAll" resultType="UserDto">
+ 		select * from USER 
+ 			<if test="field != null">
+				WHERE ${field} LIKE CONCAT('%', #{search}, '%')
+			</if>
+ 			<if test="sort != null">
+				ORDER BY ${sort} 
+			</if>
+			<if test="direct != null">
+				<choose>
+					<when test="direct.equals('desc')">desc</when>
+					<otherwise>asc</otherwise>
+				</choose>
+			</if>
+ 			LIMIT #{startRow}, #{pageSize}
+ 	</select>
+ 	<select id="selectPageAllCount" resultType = "int">
+ 		SELECT COUNT(*) FROM USER 
+ 		<if test="field != null">
+			WHERE ${field} LIKE CONCAT('%', #{search}, '%')
+		</if>
+ 	</select>
+ 	<!-- 로그인 -->
+ 	<select id="selectIdPwOne" resultType="UserDto">
+ 		SELECT * FROM USER 
+ 			WHERE user_id = #{userId} 
+ 				AND user_pw = #{userPw}
+ 	</select>
+ 	<select id="findId" resultType="UserDto">
+ 		SELECT * FROM USER 
+ 			WHERE user_name = #{user_name}
+ 				AND user_email = #{user_email}
+ 					AND user_phone = #{user_phone}
+ 	</select>
+ 	<select id="findPw" resultType="UserDto">
+ 		SELECT * FROM USER 
+ 			WHERE user_id = #{user_id}
+	 			AND user_name = #{user_name}
+	 				AND user_email = #{user_email}
+	 					AND user_phone = #{user_phone}
+ 	</select>
+ 	<select id="selectId" resultType="UserDto" parameterType="String">
+ 		SELECT * FROM USER WHERE user_id = #{user_id}
+ 	</select>
+ 	<select id="selectPhone" resultType="UserDto" parameterType="String">
+ 		SELECT * FROM USER WHERE user_phone = #{userPhone}
+ 	</select>
+ 	<select id="selectEmail" resultType="UserDto" parameterType="String">
+ 		SELECT * FROM USER WHERE user_email = #{userEmail}
+ 	</select>
+ 	<insert id="insertOne" parameterType="UserDto">
+	 	 INSERT INTO USER (user_id, user_name, user_pw, user_phone, user_email, birth, add1, add2, add3, add4)
+	 	 	VALUES (#{user_id}, #{user_name}, #{user_pw}, #{user_phone}, #{user_email}, #{birth}, #{add1}, #{add2}, #{add3}, #{add4})
+ 	</insert>
+ 	<update id="updateOne" parameterType="UserDto">
+ 		UPDATE USER SET 
+ 			user_name = #{user_name},
+ 			user_pw = #{user_pw}, 
+ 			user_phone = #{post_user_phone}, 
+ 			user_email = #{post_user_email},
+ 			birth = #{birth},
+ 			add1 = #{add1},
+ 			add2 = #{add2},
+ 			add3 = #{add3},
+ 			add4 = #{add4}
+ 			WHERE user_id = #{user_id}
+ 	</update>	
+ 	<delete id="deleteOne" parameterType="UserDto">
+ 		DELETE FROM USER WHERE user_id = #{userId}
+ 	</delete>
+ </mapper>

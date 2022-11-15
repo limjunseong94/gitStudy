@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>후기 수정</title>
+<link rel="stylesheet" href="/public/css/board/detail.css">
+<script th:src="@{/public/js/board/modify.js}" defer="defer"></script>
+</head>
+<body>
+<header th:insert="/NewHeader"></header>
+<div id="wrapper">
+<main class="container-xl">
+	<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" id="path">
+	  <ol class="breadcrumb">
+	    <li class="breadcrumb-item">
+	    	<a href="/">홈</a>
+	    </li>
+	    <li class="breadcrumb-item">
+	    	<a href="#">게시판</a>
+	    </li>
+	    <li class="breadcrumb-item" aria-current="page">
+	    	<a href="/board/list/1" class="breadcrumb-item active">후기</a>
+	    </li>
+	  </ol>
+	</nav>
+	<h1 class="pb-4 d-flex justify-content-between align-items-center" 
+	    style="border-bottom: 1px solid #e8e8e8;">
+	    <span style="font-size: 35px;">후기 수정</span>
+    </h1>	
+	<div class="mt-3 d-flex">
+		<div class="d-flex align-items-center">
+			<i class="bi bi-eye" style="margin-right: 4px;"
+				data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="조회수">
+				<span th:text="${board.views}"></span>
+			</i>
+			<a style="margin-right: 4px; margin-left: 4px; padding: 8px;"
+			class="btn btn-outline-primary border-0 rounded-pill">
+				<i th:classappend="${(board.prefer_active != null && board.prefer_active) ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up'}" class="bi "></i>				
+				<span th:text="${board.good}"></span>
+			</a> 
+			<a style="margin-right: 8px; padding: 8px;"
+			class="btn btn-outline-danger border-0 rounded-pill">
+				<i th:classappend="${(board.prefer_active != null && !board.prefer_active) ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-down'}" class="bi "></i>				
+				<span th:text="${board.bad}"></span>
+			</a>
+		</div>
+		<div class="ms-auto align-self-center">
+			<span th:text="'등록일 : ' + ${#dates.format(board.post_time,'yyyy-MM-dd HH:mm:ss')}"></span>
+		</div>
+	  </div>
+	  <div class="mt-3">
+	   <form action="/board/update.do" method="post" enctype="multipart/form-data" name="boardUpdateForm">
+		 <table class="mb-5 table table-bordered table">
+		  <tbody>
+		    <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">카테고리</th>
+		      <td style="width: 600px;">
+		      	<select name="category_id" class="form-select" id="category_id" th:value="${board.category.category_id}" style="font-size: 11px; border-radius: 2px;">
+					<option value="1" th:selected="${board.category.category_id} == '1'">관광지</option>
+					<option value="2" th:selected="${board.category.category_id} == '2'">숙박</option>
+					<option value="3" th:selected="${board.category.category_id} == '3'">맛집</option>
+				</select>
+		      </td>
+		    </tr>
+		    <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">장소명</th>
+		      <td style="width: 600px;">
+		      	<input name="place_name" class="form-control" id="place_name" th:value="${board.place_name}" onkeyup="noSpace(this)" onchange="noSpace(this)">
+		      </td>
+		    </tr>
+		    <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">평점</th>
+		      <td style="width: 600px;">
+		      	<select name="rating" class="form-select" id="rating" th:value="${board.rating}" style="font-size: 11px; border-radius: 2px;">
+					<option value="0.0" th:selected="${board.rating} == '0.0'">0.0</option>
+					<option value="0.5" th:selected="${board.rating} == '0.5'">0.5</option>
+					<option value="1.0" th:selected="${board.rating} == '1.0'">1.0</option>
+					<option value="1.5" th:selected="${board.rating} == '1.5'">1.5</option>
+					<option value="2.0" th:selected="${board.rating} == '2.0'">2.0</option>
+					<option value="2.5" th:selected="${board.rating} == '2.5'">2.5</option>
+					<option value="3.0" th:selected="${board.rating} == '3.0'">3.0</option>
+					<option value="3.5" th:selected="${board.rating} == '3.5'">3.5</option>
+					<option value="4.0" th:selected="${board.rating} == '4.0'">4.0</option>
+					<option value="4.5" th:selected="${board.rating} == '4.5'">4.5</option>
+					<option value="5.0" th:selected="${board.rating} == '5.0'">5.0</option>
+				</select>
+		      </td>
+		    </tr>
+		    <tr>
+		    	<th style="width: 100px;" class="bg-light align-middle">사진</th>
+		    	<td>
+					<div>
+						<p th:unless="${#lists.isEmpty(board.boardImgs)}" class="mb-2">삭제할 사진 선택</p>
+						<th:block th:each="boardImg : ${board.boardImgs}">
+							<label>
+								<input name="boardImgNo" type="checkbox"
+									   class="form-check-input" th:value="${boardImg.board_img_no}">
+								<img alt="후기 이미지" 
+									 th:src="@{/public/img/{file}(file=${boardImg.img_path})}" 
+									 class="img-thumbnail" width="200">
+							</label>
+						</th:block>
+					</div>
+				    <div>
+						<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+						<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+						<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+						<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+						<input name="imgFile" class="form-control form-control-lg" type="file" style="height: 29px;">
+					</div>
+		    	</td>
+		    </tr>
+		    <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">제목</th>
+		      <td style="width: 600px;">
+		      	<input name="title" class="form-control" id="title" th:value="${board.title}" onkeyup="noSpace(this)" onchange="noSpace(this)">
+		      </td>
+		    </tr>
+		    <tr>
+		      <th style="width: 100px;" class="bg-light align-middle">내용</th>
+		      <td style="width: 600px;">
+		      	<textarea name="contents" class="form-control" th:text="${board.contents}"
+		      			  onkeyup="noSpace(this)" onchange="noSpace(this)"></textarea>
+		      </td>
+		    </tr>
+		  </tbody>
+		</table>
+		<div class="d-flex">
+			<div class="ms-auto">
+				<button class="btn btn-outline-warning btn-lg" type="reset" style="padding: 12px 12.5px;">초기화</button>
+				<button class="btn btn-outline-success btn-lg" type="submit" style="margin-left: 8px; margin-right: 8px; padding: 12px 20px;">수정</button>
+				<input type="hidden" name="board_no" th:value="${board.board_no}">
+				<input type="hidden" name="user.user_id" th:value="${board.user?.user_id}">
+				<!-- Button trigger modal -->
+				<button type="button" class="btn btn-outline-danger btn-lg" 
+					    style="margin-right: 8px; padding: 12px 20px;" 
+					    data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+				  삭제
+				</button>
+				<!-- Modal -->
+				<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" 
+					 style="opacity: 1" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+				  <div class="modal-dialog">
+				    <div class="modal-content">
+				      <div class="modal-header border-0">
+				        <h1 class="modal-title fs-5" id="staticBackdropLabel">경고</h1>
+				        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				      </div>
+				      <div class="modal-body">
+				        한 번 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?
+				      </div>
+				      <div class="modal-footer border-0" style="padding: 16px;">
+				        <button type="button" class="btn btn-outline-dark btn-lg" 
+				        		data-bs-dismiss="modal" style="margin: 0 8px 0 0; padding: 12px 20px;">취소</button>
+						<th:block th:if="${session.loginUser?.adminCk == 1}">
+							<a th:href="@{/board/delete/{boardNo}/{userId}(boardNo=${board.board_no}, userId=${session.loginUser?.user_id})}" 
+							   class="btn btn-outline-danger btn-lg" style="margin: 0; padding: 12px 20px;">
+								삭제
+							</a>
+						</th:block>
+						<th:block th:unless="${session.loginUser?.adminCk == 1}">
+							<a th:href="@{/board/delete/{boardNo}/{userId}(boardNo=${board.board_no}, userId=${board.user?.user_id})}" 
+							   class="btn btn-outline-danger btn-lg" style="margin: 0; padding: 12px 20px;">
+								삭제
+							</a>
+						</th:block>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+				<a th:href="@{/board/detail/{boardNo}(boardNo=${board.board_no})}" class="btn btn-outline-dark btn-lg ms-auto"
+				   style="padding: 12px 20px;">취소</a>
+			</div>
+		</div>
+	   </form>
+	  </div>
+	</main>	
+<footer class="footer" th:insert="/NewFooter"></footer>
+</div>	
+</body>
+</html>

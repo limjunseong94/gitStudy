@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.project.mainPage.mapper.TourMapper">
+ 	<resultMap type="Tour" id="TourMap">
+		<id column="tour_rank" property="tour_rank"/>
+		<result column="tourist" property="tourist"/>
+		<result column="province" property="province"/>
+		<result column="city" property="city"/>
+		<result column="address3" property="address3"/>
+		<result column="tours" property="tours"/>	
+		<result column="views" property="views"/>	
+		<result column="search" property="search"/>
+		<result column="ranking" property="ranking"/>
+		<result column="tour_phone" property="tour_phone"/>
+		<result column="contents" property="contents"/>
+		<result column="img_path" property="img_path"/>
+		<!-- Tour : UsersDto = N : 1   -->	
+		<association property="user" javaType="UserDto" foreignColumn="user_id">
+			<id column="user_id" property="user_id"/>
+			<result column="user_name" property="user_name"/>
+			<result column="user_email" property="user_email"/>
+			<result column="birth" property="birth"/>
+		</association>
+		<association property="category" javaType="Category" foreignColumn="category_id">
+			<id column="category_id" property="category_id"/>
+		</association>
+		<collection property="tourImgs" javaType="java.util.ArrayList" ofType="TourImg">
+			<id column="tour_img_no" property="tour_img_no"/>
+			<result column="img_path" property="img_path"/>
+		</collection>	
+	</resultMap>
+	<!--  tour List  -->
+	<select id="selectListAll" resultMap="TourMap">	
+		SELECT t.*, 
+		 	
+		 	RANK() OVER(ORDER BY search DESC) AS ranking
+		 	
+			FROM TOUR t
+			
+			LEFT JOIN CATEGORY c 
+		    USING(category_id)
+		     
+			LIMIT #{startRow}, #{pageSize} 
+	</select>
+	<select id="selectRecommendation" resultMap="TourMap">
+		SELECT t.*, 
+		 	(SELECT img_path FROM TOURIMG WHERE tour_rank = t.tour_rank LIMIT 1) img_path,
+		 	RANK() OVER(ORDER BY search DESC) AS ranking
+		 	
+			FROM TOUR t
+			
+			LEFT JOIN CATEGORY c 
+		    USING(category_id)
+		    
+		    <if test="city != null">
+				WHERE city = #{city}
+			</if>
+			
+			LIMIT 3
+	</select>
+	<select id="selectPageAllCount" resultType="int">
+		SELECT COUNT(*) FROM TOUR
+	</select>
+	<!-- tour Detail  -->
+	<select id="selectDetailOne" resultMap="TourMap" parameterType="int">
+		SELECT t.*, 
+		
+			u.user_id, 
+			u.user_name, 
+			
+			i.tour_img_no AS tour_img_no,
+			i.img_path AS img_path,
+			
+		 	c.category_id
+		 	
+		 	FROM TOUR t
+		 	
+		 	INNER JOIN USER u 
+			USING(user_id)
+			
+		 	LEFT JOIN TOURIMG i 
+			USING(tour_rank)
+			
+		 	LEFT JOIN CATEGORY c 
+		    USING(category_id)
+		 	
+		 	WHERE tour_rank = #{tourRank}
+	</select>
+	<!-- 조회수 -->
+	<update id="updateViews" parameterType="int">
+		UPDATE TOUR SET 
+			views = views + 1
+			WHERE tour_rank = #{tourRank}
+	</update>
+	<insert id="insertOne" parameterType="Tour"
+	 		useGeneratedKeys="true" keyProperty="tour_rank">
+		INSERT INTO TOUR 
+			(tourist, address3, province, city, category_id, search, user_id, tour_phone, contents)
+				VALUES (#{tourist}, #{address3}, #{province}, #{city}, #{category.category_id}, #{search}, #{user.user_id}, #{tour_phone}, #{contents})
+	</insert>
+	<!-- 수정  -->
+	<update id="updateOne" parameterType="Tour">
+		UPDATE TOUR SET 
+				tourist = #{tourist},
+				city = #{city},
+				address3 = #{address3},
+				search = #{search},
+				tour_phone = #{tour_phone},
+				contents = #{contents}
+				WHERE tour_rank = #{tour_rank}
+	</update>
+	<!-- 삭제  -->
+	<delete id="deleteOne" parameterType="int">
+		DELETE FROM TOUR 
+			WHERE tour_rank = #{tourRank}
+	</delete>
+	<select id="mainPageTour" resultType="Tour">
+		SELECT DISTINCT t.tour_rank,
+			t.*, 
+			(SELECT img_path FROM TOURIMG WHERE tour_rank = t.tour_rank LIMIT 1) img_path,
+			RANK() OVER(ORDER BY search DESC) AS ranking
+			
+		 	FROM TOUR t
+		 	
+			LIMIT 3;
+	</select>	
+ </mapper>

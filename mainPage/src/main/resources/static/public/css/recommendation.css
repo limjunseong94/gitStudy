@@ -1,0 +1,36 @@
+/* 홈 > TOP 10 CSS  */
+#path {
+    display: flex;
+    margin: 91px 0 25px 0;
+}
+#path ol {
+    margin-left: auto;      
+}
+#path ol li a {   
+    text-decoration: none;
+    vertical-align: middle;
+}
+/*footer css 하단고정  */
+html, body {
+   height: 100vh;
+}
+#wrapper {
+    min-height: 100%;
+    position: relative;
+    padding-bottom: 345px;
+}
+.footer {
+    bottom: 0;
+    position: absolute;
+	width: 100%;
+}
+@media (max-width: 576px) {
+	#wrapper {
+	    padding-bottom: 750px;
+	}
+}
+@media (max-width: 992px) {
+	#path {
+	    margin-top: 93px;
+	}
+}

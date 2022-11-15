@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mainPage.mapper.ReplyMapper">
+	<resultMap type="Reply" id="ReplyMap">
+		<id column="reply_no" property="reply_no"/>
+		<result column="contents" property="contents"/>
+		<result column="post_time" property="post_time"/>
+		<result column="img_path" property="img_path"/>
+		<result column="board_no" property="board_no"/>
+		<association property="user" javaType="UserDto">
+			<id column="user_id" property="user_id"/>
+		</association>
+		<collection property="good_prefers" javaType="java.util.ArrayList" ofType="ReplyPrefer">
+			<id column="good_reply_prefer_no" property="reply_prefer_no"/>
+			<result column="good_reply_no" property="reply_no"/>
+			<result column="good_prefer" property="prefer"/>
+			<result column="good_user_id" property="user_id"/>
+		</collection>
+		<collection property="bad_prefers" javaType="java.util.ArrayList" ofType="ReplyPrefer">
+			<id column="bad_reply_prefer_no" property="reply_prefer_no"/>
+			<result column="bad_reply_no" property="reply_no"/>
+			<result column="bad_prefer" property="prefer"/>
+			<result column="bad_user_id" property="user_id"/>
+		</collection>
+	</resultMap>
+	<select id="selectOneJoinPrefers" resultMap="ReplyMap" parameterType="int">
+		SELECT r.*,
+		
+			g.reply_prefer_no AS good_reply_prefer_no,
+			g.reply_no AS good_reply_no,
+			g.prefer AS good_prefer,
+			g.user_id AS good_user_id,
+			
+			b.reply_prefer_no AS bad_reply_prefer_no,
+			b.reply_no AS bad_reply_no,
+			b.prefer AS bad_prefer,
+			b.user_id AS bad_user_id
+			
+			FROM REPLY r 
+			
+			LEFT JOIN (SELECT * FROM REPLY_PREFER WHERE prefer = 1) g
+			ON r.reply_no = g.reply_no
+			
+			LEFT JOIN (SELECT * FROM REPLY_PREFER WHERE prefer = 0) b
+			ON r.reply_no = b.reply_no
+			
+			WHERE r.reply_no = #{reply_no}
+	</select>
+	<select id="selectBoardNoPage" resultType="Reply">
+		SELECT reply_no, 
+			   contents, 
+			   post_time, 
+			   img_path, 
+			   board_no,
+			   reply_no	AS no,
+			   user_id AS 'user.user_id',
+			   (SELECT COUNT(*) FROM REPLY_PREFER WHERE reply_no = no AND prefer = 1) AS good,
+			   (SELECT COUNT(*) FROM REPLY_PREFER WHERE reply_no = no AND prefer = 0) AS bad
+			   <if test="loginUsersId != null">
+			   ,(SELECT prefer FROM REPLY_PREFER WHERE reply_no = no AND user_id = #{loginUsersId}) AS prefer_active
+			   </if>	
+			   FROM REPLY 
+			   	 WHERE board_no = #{boardNo}
+			   	 <if test="writer != null">
+			   	 	AND user_id = #{writer}
+			   	 </if>
+			   	 <if test="sort != null">
+					ORDER BY ${sort} 
+				 </if>
+				 <if test="direct != null">
+					<choose>
+						<when test="direct.equals('desc')">DESC</when>
+						<otherwise>ASC</otherwise>
+					</choose>
+				 </if>
+	</select>
+	<select id="selectBoardNoCount" resultType="int">
+		SELECT COUNT(*) FROM REPLY 
+			WHERE board_no = #{boardNo}
+	</select>
+	<select id="selectBoardNo" resultType="Reply" parameterType="int">
+		SELECT *, 
+			   user_id AS 'user.user_id' 
+			   		FROM REPLY 
+						WHERE board_no = #{boardNo}
+	</select>
+	<select id="selectOne" resultType="Reply" parameterType="int">
+		SELECT *, 
+			   user_id AS 'user.user_id' 
+					FROM REPLY 
+						WHERE reply_no = #{reply_no}
+	</select>
+	<select id="selectUserId" resultType="Reply" parameterType="String">
+		SELECT *, 
+			   user_id AS 'user.user_id' 
+					FROM REPLY 
+						WHERE user_id = #{user_id}
+	</select>
+	<select id="selectBoardNoAndUserId" resultType="int">
+		SELECT COUNT(*) FROM REPLY
+			WHERE board_no = #{boardNo} 
+				AND user_id = #{user_id};
+	</select>
+	<insert id="insertOne" parameterType="Reply">
+		INSERT INTO REPLY (img_path, contents, board_no, user_id) 
+			VALUES (#{img_path}, #{contents}, #{board_no}, #{user.user_id})
+	</insert>
+	<update id="updateOne" parameterType="Reply">
+		UPDATE REPLY 
+			SET img_path = #{img_path}, 
+				contents = #{contents} 
+					WHERE reply_no = #{reply_no}
+	</update>
+	<delete id="deleteOne" parameterType="int">
+		DELETE FROM REPLY 
+			WHERE reply_no = #{reply_no}
+	</delete>
+</mapper>

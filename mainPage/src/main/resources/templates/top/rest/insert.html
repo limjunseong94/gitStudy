@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>음식점 등록</title>
+<link rel="stylesheet" href="/public/css/board/insert.css">
+<script src="/public/js/top/rest/insert.js" defer="defer"></script>
+</head>
+<body>
+<header th:insert="/NewHeader"></header>
+<div id="wrapper">
+	<main class="container-xl">
+		<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" id="path">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+					<a href="/">홈</a>
+				</li>
+				<li class="breadcrumb-item">
+					<a href="#">Top 10</a>
+				</li>
+				<li class="breadcrumb-item" aria-current="page">
+					<a href="/top/rest/list/1" class="breadcrumb-item active">음식점</a>
+				</li>
+			</ol>
+		</nav>
+		<h1 class="pb-4 d-flex justify-content-between align-items-center" 
+		    style="border-bottom: 1px solid #e8e8e8;">
+		    <span style="font-size: 35px;">음식점 등록</span>
+	    </h1>
+		<form action="/top/rest/insert.do" method="post" enctype="multipart/form-data" name="restInsertForm">
+			<table class="mt-5 mb-5 table align-middle table-bordered">
+				<tbody>
+					<tr>
+						<th class="table-light">카테고리</th>
+						<td>
+							<select name="category.category_id" class="form-select" id="category_id" style="font-size: 11px; border-radius: 2px;">
+									<option value="1">관광지</option>
+									<option value="2">숙박</option>
+									<option value="3">맛집</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th class="table-light">음식점명</th>
+						<td>
+							<input name="tourist" class="form-control" id="tourist"
+								   onkeyup="noSpace(this);" onchange="noSpace(this);">
+						</td>
+					</tr>
+					<tr>
+						<th class="table-light">지역</th>
+						<td>
+							<input name="province" class="form-control" id="province" value="제주특별자치도"
+								   onkeyup="noSpace(this);" onchange="noSpace(this);">
+						</td>
+					</tr>
+					<tr>
+						<th class="table-light">서귀포 / 제주</th>
+						<td>
+							<select name="city" class="form-select" id="city" style="font-size: 11px; border-radius: 2px;">
+									<option value="서귀포시">서귀포</option>
+									<option value="제주시">제주</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th class="table-light">전화번호</th>
+						<td>
+							<input name="rest_phone" class="form-control" id="rest_phone" 
+								   onkeydown="noSpaceForm(this);" onchange="noSpaceForm(this);" 
+								   oninput="phoneAutoComplete(this)" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');" maxlength="13">
+						</td>
+					</tr>
+					<tr>
+						<th class="table-light">주소</th>
+						<td>
+							<input name="address2" class="form-control" id="address2" value="제주특별자치도"
+								   onkeyup="noSpace(this);" onchange="noSpace(this);">
+						</td>
+					</tr>
+					<tr>
+						<th class="table-light">사진</th>
+						<td>
+							<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+							<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+							<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+							<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+							<input name="imgFile" class="form-control mb-1 form-control-lg" type="file" style="height: 29px;">
+						</td>
+					</tr>
+					<tr>
+						<th class="table-light">설명</th>
+						<td>
+							<input name="contents" class="form-control" id="contents"
+								   onkeyup="noSpace(this);" onchange="noSpace(this);">
+						</td>
+					</tr>
+					<tr>
+						<th class="table-light">검색 수</th>
+						<td>
+							<input name="search" class="form-control" id="search" value="0"
+								   onkeydown="noSpaceForm(this);" onchange="noSpaceForm(this);"
+								   onKeyup="this.value=this.value.replace(/[^0-9]/g,'');">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="d-flex">
+				<div class="ms-auto">
+					<button class="btn btn-outline-warning btn-lg" type="reset" style="margin-right: 8px; padding: 12px 12.5px;">초기화</button>
+					<button class="btn btn-outline-primary btn-lg" type="submit" style="margin-right: 8px; padding: 12px 20px;">등록</button>
+					<input type="hidden" name="user.user_id" th:value="${session.loginUser.user_id}">
+					<a class="btn btn-outline-dark btn-lg" href="/top/rest/list/1" style="padding: 12px 20px;">목록</a>
+				</div>
+			</div>
+		</form>
+	</main>
+	<footer class="footer" th:insert="/NewFooter"></footer>
+</div>
+</body>
+</html>
